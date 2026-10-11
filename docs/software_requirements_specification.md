@@ -7,7 +7,7 @@ This document is the Software Requirements Specification (SRS) for AutoPlex Moto
 # Functional Requirements
 
 1. **Customer Management** (Customer form and list)
-    1. FR-CUS-01: The system shall let a salesperson create, edit, and view customers with name, phone, email, address, city, state, and ZIP. *[S1]*
+    1. FR-CUS-01: The system shall allow a salesperson to create, edit, and view customer records containing a name, phone number, email address, street address, city, state, and ZIP code. *[S1]*
     2. FR-CUS-02: The system shall require first name and last name. *[S1]*
     3. FR-CUS-03: The system shall validate that email is in a valid format when provided. *[S1]*
     4. FR-CUS-04: The system shall create new customers with status Active and allow them to be set Active or Inactive. *[S1]*
