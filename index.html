@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>AutoPlex Motors | Term Project</title>
-  <meta name="description" content="Term project site for AutoPlex Motors: a dealership sales, purchasing, banking and reporting system.">
+  <meta name="description" content="Term project site for AutoPlex Motors: a dealership sales, purchasing, banking, and reporting system.">
   <style>
     :root {
       --bg: #f5f7fb;
@@ -121,12 +121,12 @@
 <nav>
   <a href="#overview">Overview</a>
   <a href="#artifacts">Artifacts</a>
-  <a href="#er">ER</a>
-  <a href="#usecase">Use Case</a>
-  <a href="#activity">Activity</a>
-  <a href="#crc">CRC</a>
-  <a href="#class">Class</a>
-  <a href="#docs">Docs</a>
+  <a href="#er">ERD</a>
+  <a href="#usecase">Use Cases</a>
+  <a href="#activity">Activity Diagrams</a>
+  <a href="#crc">CRC Cards</a>
+  <a href="#class">Class Diagrams</a>
+  <a href="#docs">Documents</a>
 </nav>
 
 <main>
@@ -136,36 +136,36 @@
     <h2>Project Overview</h2>
     <div class="card">
       <p>
-        <strong>AutoPlex Motors</strong> is the term project for CIS641 Software Analysis and Design: a software system that helps a
-        vehicle dealership run its day-to-day business. It tracks the vehicles a dealership buys from
-        vendors, the customers it sells to, the money owed in each direction, the bank accounts that
-        money moves through, and the resulting profit and loss.
+        <strong>AutoPlex Motors</strong> is the term project for CIS641 Software Analysis and Design. It is a
+        software system that helps a vehicle dealership manage its day-to-day business. It tracks the
+        vehicles a dealership buys from vendors, the customers it sells to, the money owed in each
+        direction, the bank accounts through which money moves, and the resulting profit and loss.
       </p>
       <p>
-        The system was designed in phases. Each phase adds a layer of data and rules on top of the one
-        before it, from master data up through financial reporting.
+        The system was designed in phases. Each phase builds on the previous one by adding data and
+        business rules, from master data through financial reporting.
       </p>
     </div>
 
     <h3>Scope by phase</h3>
     <div class="grid">
       <div class="card"><h4>Phase 1: Master data</h4><p>Customers, employees and vendors.</p></div>
-      <div class="card"><h4>Phase 2: Inventory</h4><p>Vehicles (with status Available, Reserved, Sold) and parts.</p></div>
-      <div class="card"><h4>Phase 3: Sales</h4><p>Sales invoices with draft, post and cancel rules; payment conditions of paid in full, partial or credit.</p></div>
+      <div class="card"><h4>Phase 2: Inventory</h4><p>Vehicles with Available, Reserved, or Sold status, along with parts.</p></div>
+      <div class="card"><h4>Phase 3: Sales</h4><p>Sales invoices with draft, posting, and cancellation rules; payment statuses of paid in full, partially paid, or credit.</p></div>
       <div class="card"><h4>Phase 4: Accounts receivable</h4><p>AR invoices, customer payments, aging and overdue tracking.</p></div>
       <div class="card"><h4>Phase 5: Accounts payable</h4><p>AP bills and vendor payments created when a purchase leaves a balance.</p></div>
       <div class="card"><h4>Phases 6 and 7: Banking</h4><p>Banks, bank accounts, receipts, payments, the internal transaction ledger and simulated bank statements.</p></div>
-      <div class="card"><h4>Phase 8: Reconciliation</h4><p>Match ledger transactions to statement lines, confirm matches, reset with a reason and post adjustments.</p></div>
-      <div class="card"><h4>Phase 9: Reporting</h4><p>Profit and loss with revenue, COGS and operating expenses, period comparison, drill-down and export.</p></div>
+      <div class="card"><h4>Phase 8: Reconciliation</h4><p>Match ledger transactions to statement lines, confirm matches, reset them with a reason, and post adjustments.</p></div>
+      <div class="card"><h4>Phase 9: Reporting</h4><p>Profit and loss reporting with revenue, COGS, and operating expenses, plus period comparison, drill-down, and export.</p></div>
     </div>
 
     <h3>Key business flows</h3>
     <div class="card">
       <ul>
-        <li><strong>Purchase a vehicle:</strong> choose a vendor, enter details and cost, add the vehicle to inventory as Available, and create an AP bill when a vendor balance remains.</li>
-        <li><strong>Create a sales invoice:</strong> choose a customer and an available vehicle, enter price, taxes and fees, validate, save, create an AR invoice when a balance remains, and mark the vehicle Sold.</li>
+        <li><strong>Purchase a vehicle:</strong> choose a vendor, enter the vehicle details and cost, add the vehicle to inventory as Available, and create an AP bill when a vendor balance remains.</li>
+        <li><strong>Create a sales invoice:</strong> choose a customer and an available vehicle, enter the price, taxes, and fees, validate and save the invoice, create an AR invoice when a balance remains, and mark the vehicle as Sold.</li>
         <li><strong>Reconcile the bank:</strong> compare posted transactions with statement lines, confirm matches and post statement-only adjustments.</li>
-        <li><strong>Report:</strong> generate a profit and loss for a month, quarter or year to date and drill down to the source records.</li>
+        <li><strong>Report:</strong> generate a profit and loss report for a month, quarter, or year-to-date period and drill down to the source records.</li>
       </ul>
     </div>
   </section>
@@ -173,10 +173,10 @@
   <!-- 2. ARTIFACTS -->
   <section id="artifacts">
     <h2>Project Artifacts</h2>
-    <p>Diagrams are shown in the order they were produced: ER, Use Case, Activity, CRC, then Class. Click any image to open it at full size.</p>
+    <p>Diagrams are shown in the order in which they were produced: ERD, use-case, activity, CRC, and class diagrams. Click any image to open it at full size.</p>
     <div class="card">
       <ul class="links">
-        <li><a href="#er">1. Entity Relationship Diagram</a></li>
+        <li><a href="#er">1. Entity Relationship Diagram (ERD)</a></li>
         <li><a href="#usecase">2. Use Case Diagrams</a> <span class="note">(Create Sales Invoice, Purchase Vehicle)</span></li>
         <li><a href="#activity">3. Activity Diagrams</a> <span class="note">(Create Invoice, Purchase Vehicle)</span></li>
         <li><a href="#crc">4. CRC Cards</a> <span class="note">(Phases 1–9 slideshow)</span></li>
@@ -190,7 +190,7 @@
     <h2>1. Entity Relationship Diagram</h2>
     <figure class="artifact">
       <figcaption>Updated ERD
-        <span>All entities from vendors and vehicles through sales, AR/AP, bank accounts, the internal ledger and statement lines.</span>
+        <span>Includes entities for vendors, vehicles, sales, AR/AP, bank accounts, the internal ledger, and statement lines.</span>
       </figcaption>
       <a class="img-link" href="artifacts/ERD%20Bank_StatementLine_Updated.png"><img src="artifacts/ERD%20Bank_StatementLine_Updated.png" alt="AutoPlex Motors updated entity relationship diagram"></a>
     </figure>
@@ -221,13 +221,13 @@
     <div class="pair">
       <figure class="artifact">
         <figcaption>Create Invoice
-          <span>Select customer and vehicle, enter price, taxes and fees, validate, then save, create AR invoice and mark vehicle sold.</span>
+          <span>Select a customer and vehicle, enter the price, taxes, and fees, validate, save the invoice, create an AR invoice, and mark the vehicle as sold.</span>
         </figcaption>
         <a class="img-link" href="artifacts/activityCreateInvoice.png"><img src="artifacts/activityCreateInvoice.png" alt="Activity diagram: Create Invoice"></a>
       </figure>
       <figure class="artifact">
         <figcaption>Purchase Vehicle
-          <span>Select vendor, enter details and cost, validate, then add to inventory, create AP bill and mark available.</span>
+          <span>Select a vendor, enter the vehicle details and cost, validate, add the vehicle to inventory, create an AP bill, and mark it as available.</span>
         </figcaption>
         <a class="img-link" href="artifacts/activityPurchaseVehicle.png"><img src="artifacts/activityPurchaseVehicle.png" alt="Activity diagram: Purchase Vehicle"></a>
       </figure>
