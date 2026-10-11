@@ -1,26 +1,26 @@
 # AutoPlex Motors: Incremental User Stories
 
-Each story below is small enough to build, test, and merge to main on its own. A story depends only on earlier stories. Every 'Not yet' line says what is deliberately left out and which later story adds it, so no story refers to a table that does not exist yet.
+Each story below is small enough to build, test, and merge into the main branch independently. Stories depend only on earlier stories. Each **Not yet** note identifies what is intentionally excluded and which later story adds it, so no story refers to a table that has not yet been introduced.
 
 ## Delivery sequence
 
 - Phase 1, Master data: 1 Manage customers, 2 Manage employees, 3 Manage vendors
 - Phase 2, Inventory: 4 Add a vehicle to inventory, 5 Browse vehicle inventory, 6 Manage parts inventory
-- Phase 3, Sales invoice: 7 Create a draft sales invoice, 8 Post a sales invoice, 9 Cancel and browse sales invoices
-- Phase 4, Accounts Receivable: 10 Payment condition and AR, 11 Record a later customer payment, 12 AR list and aging, 13 Customer balances
-- Phase 5, Accounts Payable: 14 Vehicle purchase payment condition and AP, 15 Record a later vendor payment, 16 AP list and aging
+- Phase 3, Sales Invoices: 7 Create a draft sales invoice, 8 Post a sales invoice, 9 Cancel and browse sales invoices
+- Phase 4, Accounts Receivable: 10 Payment conditions and AR, 11 Record a later customer payment, 12 AR list and aging, 13 Customer balances
+- Phase 5, Accounts Payable: 14 Vehicle purchase payment conditions and AP, 15 Record a later vendor payment, 16 AP list and aging
 - Phase 6, Banking: 17 Banks and bank accounts, 18 Bank receipts, 19 Bank payments, 20 Internal transaction ledger, 21 Reverse a banking transaction, 22 Transfer between accounts
-- Phase 7, Simulated bank statement: 23 Generate statement lines, 24 Statement-only adjustment, 25 Add and post an adjustment
+- Phase 7, Simulated Bank Statements: 23 Generate statement lines, 24 Statement-only adjustment, 25 Add and post an adjustment
 - Phase 8, Reconciliation: 26 Reconciliation data and balances, 27 Suggest matches, 28 Confirm a match, 29 Post an unmatched adjustment, 30 Reset or reopen reconciliation
-- Phase 9, Reporting: 31 Revenue, 32 COGS, 33 Operating expenses, 34 Profit & Loss report, 35 Compare periods, 36 Drill-down and export
+- Phase 9, Reporting: 31 Revenue, 32 COGS, 33 Operating expenses, 34 Profit and Loss report, 35 Compare periods, 36 Drill down and export
 
 ## Rules that apply to every story
 
-- Posting is atomic: all related records save, or none do.
+- Posting is atomic: either all related records are saved, or none are.
 - Posted records are reversed or cancelled, never deleted.
-- Money uses decimal arithmetic.
-- Records keep their creation date, user, reference, and status.
-- Validation errors are shown before posting.
+- Monetary values use decimal arithmetic.
+- Records retain their creation date, user, reference, and status.
+- Validation errors are displayed before posting.
 
 ## Phase 1: Master data
 
@@ -39,7 +39,7 @@ As a salesperson,
 
 - Sales invoices can select an existing customer
 
-**Not yet:** balance and totalPurchases exist but stay 0 until Story 13.
+**Not yet:** Balance and totalPurchases exist but remain 0 until Story 13.
 
 **Acceptance criteria**
 
@@ -88,7 +88,7 @@ As a purchasing officer,
 
 - Vehicle and parts purchases can reference the supplier
 
-**Not yet:** vendor balance and totalPurchases stay 0 until Stories 14 to 16.
+**Not yet:** Vendor balance and totalPurchases remain 0 until Stories 14–16.
 
 **Acceptance criteria**
 
@@ -121,7 +121,7 @@ Total Vehicle Cost =
 Purchase Price + Additional Costs
 ```
 
-**Not yet:** payment condition, AP Bill, and any payment (Stories 14 and 19).
+**Not yet:** Payment conditions, the AP Bill, and payments (Stories 14 and 19).
 
 **Acceptance criteria**
 
@@ -153,7 +153,7 @@ Gross Profit = Selling Price − Total Vehicle Cost
 Gross Margin % = Gross Profit ÷ Selling Price × 100
 ```
 
-**Not yet:** Sold status, which Story 8 sets.
+**Not yet:** Sold status, which is assigned in Story 8.
 
 **Acceptance criteria**
 
@@ -177,7 +177,7 @@ As a parts inventory manager,
 
 - Parts are reordered before stock runs out
 
-**Not yet:** quantity changes from sales or usage, and parts COGS (Story 32). Quantity is edited manually for now.
+**Not yet:** Quantity changes from sales or usage, and parts COGS (Story 32). Quantity is edited manually for now.
 
 **Acceptance criteria**
 
@@ -212,7 +212,7 @@ Invoice Total =
 Sale Price + Tax + Fees − Discount
 ```
 
-**Not yet:** posting, vehicle status change, payments, AR, receipts, bank, and statement (Stories 8, 10, 18).
+**Not yet:** Posting, vehicle status changes, payments, AR, receipts, banking, and statements (Stories 8, 10, and 18).
 
 **Acceptance criteria**
 
@@ -239,7 +239,7 @@ As a salesperson,
 - The vehicle cannot be sold twice
 - Revenue and COGS can be reported later
 
-**Not yet:** payment condition and AR (Story 10). Posted invoices start as Unpaid.
+**Not yet:** Payment conditions and AR (Story 10). Posted invoices start as Unpaid.
 
 **Acceptance criteria**
 
@@ -266,7 +266,7 @@ As a salesperson,
 - Mistakes are corrected without losing history
 - The vehicle can return to inventory
 
-**Not yet:** cancelling invoices that already have payments (Story 21).
+**Not yet:** Cancelling invoices that already have payments (Story 21).
 
 **Acceptance criteria**
 
@@ -297,7 +297,7 @@ As a salesperson,
 
 The initial amount is saved as a Customer Payment record (invoice, date, amount, method, reference). It has no bank account yet.
 
-**Not yet:** bank account, bank receipt, transaction, and statement line (Stories 18, 20, 23).
+**Not yet:** A bank account, bank receipt, transaction, and statement line (Stories 18, 20, and 23).
 
 **Acceptance criteria**
 
@@ -323,7 +323,7 @@ As an accounts receivable clerk,
 
 - AR and invoice balances stay current
 
-**Not yet:** bank account (Story 18).
+**Not yet:** A bank account (Story 18).
 
 **Acceptance criteria**
 
@@ -340,7 +340,9 @@ As an accounts receivable clerk,
 
 As an accountant,
 
-I want to view outstanding AR with days overdue and status
+**I want to:**
+
+- View outstanding AR with the number of days overdue and its status
 
 **so that:**
 
@@ -348,8 +350,8 @@ I want to view outstanding AR with days overdue and status
 
 **Acceptance criteria**
 
-- The list shows customer, invoice, due date, amount, paid, balance, days, and status.
-- Days overdue is the as-of date minus the due date, never below zero.
+- The list shows the customer, invoice, due date, amount, paid amount, balance, days overdue, and status.
+- Days overdue equals the as-of date minus the due date and can never be less than zero.
 - An open AR with a past due date shows Overdue.
 - The list filters by status and customer.
 
@@ -359,7 +361,9 @@ I want to view outstanding AR with days overdue and status
 
 As an accountant,
 
-I want customer balance and total purchases kept up to date
+**I want to:**
+
+- Keep customer balances and total purchases up to date
 
 **so that:**
 
@@ -374,7 +378,7 @@ I want customer balance and total purchases kept up to date
 
 ## Phase 5: Accounts Payable
 
-### Story 14: Vehicle purchase payment condition and AP
+### Story 14: Vehicle purchase payment conditions and AP
 
 **Depends on:** Story 4
 
@@ -424,7 +428,7 @@ As an accounts payable clerk,
 
 - AP and vendor balances stay current
 
-**Not yet:** bank account and balance check (Story 19).
+**Not yet:** A bank account and balance check (Story 19).
 
 **Acceptance criteria**
 
@@ -440,7 +444,9 @@ As an accounts payable clerk,
 
 As an accountant,
 
-I want to view open AP Bills with days overdue and status
+**I want to:**
+
+- View open AP Bills with the number of days overdue and their status
 
 **so that:**
 
@@ -448,8 +454,8 @@ I want to view open AP Bills with days overdue and status
 
 **Acceptance criteria**
 
-- The list shows vendor, bill, due date, amount, paid, balance, days, and status.
-- Days overdue is never below zero.
+- The list shows the vendor, bill, due date, amount, paid amount, balance, days overdue, and status.
+- Days overdue can never be less than zero.
 - An open bill with a past due date shows Overdue.
 - Vendor outstanding balance equals the sum of that vendor's open AP balances.
 
@@ -544,7 +550,7 @@ As an accounts payable clerk,
 
 As an accountant,
 
-I want every bank receipt and payment recorded as an internal Transaction
+**I want to:** have every bank receipt and payment recorded as an internal Transaction
 
 **so that:**
 
@@ -556,12 +562,12 @@ I want every bank receipt and payment recorded as an internal Transaction
 **Acceptance criteria**
 
 - Each posted receipt or payment creates exactly one Transaction.
-- Direction is in for receipts and out for payments, and amount is greater than zero.
+- The direction is In for receipts and Out for payments, and the amount is greater than zero.
 - Each Transaction references one bank account and its source.
 - Reconciliation status starts as Unreconciled and is kept separate from posting status.
 - Draft Transactions do not affect balances.
 - Posted Transactions cannot be deleted.
-- Existing receipts and payments are backfilled, once each.
+- Existing receipts and payments are backfilled exactly once.
 - The list filters by account, direction, and date.
 
 ### Story 21: Reverse a banking transaction
@@ -570,14 +576,14 @@ I want every bank receipt and payment recorded as an internal Transaction
 
 As an accountant,
 
-I want to reverse an incorrect receipt or payment
+**I want to:** reverse an incorrect receipt or payment
 
 **so that:**
 
 - History is preserved and balances are corrected
 - AR or AP balances are restored
 
-This also lets Story 9 cancel invoices that were paid, after their receipts are reversed.
+This enables Story 9 to cancel invoices that have been paid after their receipts are reversed.
 
 **Acceptance criteria**
 
@@ -585,7 +591,7 @@ This also lets Story 9 cancel invoices that were paid, after their receipts are 
 - A reversed receipt creates an outgoing Transaction. A reversed payment creates an incoming Transaction.
 - The reversal amount equals the amount being reversed.
 - Bank balance, AR or AP balance, and invoice or bill status are restored.
-- The original and the reversal both stay visible.
+- Both the original transaction and its reversal remain visible.
 - The same Transaction cannot be reversed twice.
 
 ### Story 22: Transfer between bank accounts
@@ -594,7 +600,7 @@ This also lets Story 9 cancel invoices that were paid, after their receipts are 
 
 As an accountant,
 
-I want to move money between two AutoPlex bank accounts
+**I want to:** move money between two AutoPlex bank accounts
 
 **so that:**
 
@@ -619,7 +625,7 @@ I want to move money between two AutoPlex bank accounts
 
 As an accountant,
 
-I want a simulated bank statement line for each posted Transaction
+**I want to:** have a simulated bank statement line generated for each posted Transaction
 
 **so that:**
 
@@ -633,10 +639,10 @@ Previous Running Balance + Deposit − Withdrawal
 **Acceptance criteria**
 
 - Each Transaction creates exactly one line with source Simulated and status Cleared.
-- Incoming Transactions set a deposit and outgoing set a withdrawal. Never both.
+- Incoming Transactions create deposits, and outgoing Transactions create withdrawals; a line never contains both.
 - Lines created from Transactions start as Matched and store the Transaction ID.
 - Running balance is calculated in statement-date order.
-- Existing Transactions are backfilled, once each.
+- Existing Transactions are backfilled exactly once.
 - The list filters by account, month, and type.
 
 ### Story 24: Statement-only adjustment
@@ -645,7 +651,7 @@ Previous Running Balance + Deposit − Withdrawal
 
 As an accountant,
 
-I want to add bank-originated activity such as interest, charges, and refunds to the statement only
+**I want to:** add bank-originated activity, such as interest, charges, and refunds, to the statement only
 
 **so that:**
 
@@ -664,7 +670,7 @@ matchStatus = Unmatched
 
 - Account, date, type, direction, amount, and description are required.
 - Interest defaults to incoming and bank charges to outgoing.
-- No Transaction is created and the book balance does not change.
+- No Transaction is created, and the book balance does not change.
 - The statement running balance updates.
 - A bank reference is unique within the account when provided.
 
@@ -674,7 +680,7 @@ matchStatus = Unmatched
 
 As an accountant,
 
-I want to add an adjustment and post its internal Transaction at the same time
+**I want to:** add an adjustment and post its internal Transaction at the same time
 
 **so that:**
 
@@ -696,7 +702,7 @@ I want to add an adjustment and post its internal Transaction at the same time
 
 As an accountant,
 
-I want to pick a bank account and statement date and see book and statement balances
+**I want to:** select a bank account and statement date and view the book and statement balances
 
 **so that:**
 
@@ -728,7 +734,7 @@ Statement Closing Balance − Book Closing Balance
 
 As an accountant,
 
-I want suggested matches between Transactions and statement lines
+**I want to:** receive suggested matches between Transactions and statement lines
 
 **so that:**
 
@@ -749,7 +755,7 @@ I want suggested matches between Transactions and statement lines
 
 As an accountant,
 
-I want to confirm a suggested match
+**I want to:** confirm a suggested match
 
 **so that:**
 
@@ -770,7 +776,7 @@ I want to confirm a suggested match
 
 As an accountant,
 
-I want to create the missing Transaction for an unmatched statement line
+**I want to:** create the missing Transaction for an unmatched statement line
 
 **so that:**
 
@@ -790,7 +796,7 @@ I want to create the missing Transaction for an unmatched statement line
 
 As an authorized accountant,
 
-I want to reset or reopen a reconciliation
+**I want to:** reset or reopen a reconciliation
 
 **so that:**
 
@@ -812,7 +818,7 @@ I want to reset or reopen a reconciliation
 
 As a financial controller,
 
-I want revenue calculated from posted business records
+**I want to:** have revenue calculated from posted business records
 
 **so that:**
 
@@ -837,7 +843,7 @@ Vehicle Revenue + Service Revenue + Fee Income
 
 As a financial controller,
 
-I want COGS calculated from the cost of inventory sold
+**I want to:** have COGS calculated from the cost of inventory sold
 
 **so that:**
 
@@ -850,7 +856,7 @@ Parts COGS = Actual quantity sold × Cost Price
 
 **Acceptance criteria**
 
-- Only vehicles on posted invoices are included, once each.
+- Each vehicle on a posted invoice is included exactly once.
 - Unsold inventory and AP payments create no COGS.
 - Cancelled sales reverse their COGS.
 - Parts COGS stays zero until part sale or usage records exist.
@@ -861,7 +867,7 @@ Parts COGS = Actual quantity sold × Cost Price
 
 As a financial controller,
 
-I want operating expenses from payroll and categorized payments
+**I want to:** calculate operating expenses from payroll and categorized payments
 
 **so that:**
 
@@ -875,13 +881,13 @@ I want operating expenses from payroll and categorized payments
 - The same expense is never counted from both an accrual and a cash payment.
 - Interest received is income, not a negative expense.
 
-### Story 34: Profit & Loss report
+### Story 34: Profit and Loss report
 
 **Depends on:** Stories 31, 32, 33
 
 As a financial controller,
 
-I want a Profit & Loss report for a selected month, quarter, or year to date
+**I want to:** generate a profit and loss report for a selected month, quarter, or year-to-date period
 
 **so that:**
 
@@ -891,7 +897,7 @@ I want a Profit & Loss report for a selected month, quarter, or year to date
 
 - Shows total revenue, COGS, gross profit, operating expenses, net profit, gross margin, and net margin.
 - Draft and cancelled invoices are excluded.
-- Results are the same for the same period and data.
+- The report produces the same results whenever the period and data are unchanged.
 
 ### Story 35: Compare periods
 
@@ -899,7 +905,7 @@ I want a Profit & Loss report for a selected month, quarter, or year to date
 
 As a financial controller,
 
-I want to compare the current period with a previous one
+**I want to:** compare the current period with a previous period
 
 **so that:**
 
@@ -922,7 +928,7 @@ Percentage Change =
 
 As an accountant,
 
-I want to open the records behind each amount and export the report
+**I want to:** open the records behind each amount and export the report
 
 **so that:**
 
