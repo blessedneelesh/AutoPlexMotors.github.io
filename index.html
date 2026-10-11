@@ -89,6 +89,16 @@
     figure.artifact figcaption span { display: block; font-weight: 400; color: var(--muted); font-size: .92rem; }
     figure.artifact a.img-link { display: block; overflow-x: auto; background: #fff; border-radius: 6px; border: 1px solid var(--border); }
     figure.artifact img { display: block; max-width: 100%; height: auto; margin: 0 auto; }
+    .slideshow { position: relative; }
+    .slide { display: none; margin: 0; }
+    .slide.active { display: block; }
+    .slide-controls { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 16px; }
+    .slide-button {
+      border: 1px solid var(--border); border-radius: 6px; background: var(--surface);
+      color: var(--text); cursor: pointer; font: inherit; padding: 7px 12px;
+    }
+    .slide-button:hover, .slide-button:focus-visible { background: var(--bg); border-color: var(--accent); }
+    .slide-indicator { color: var(--muted); font-size: .95rem; min-width: 100px; text-align: center; }
     .pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
     .pair figure.artifact { margin-bottom: 0; }
     .group { margin-bottom: 36px; }
@@ -126,7 +136,7 @@
     <h2>Project Overview</h2>
     <div class="card">
       <p>
-        <strong>AutoPlex Motors</strong> is the term project for this course: a software system that helps a
+        <strong>AutoPlex Motors</strong> is the term project for CIS641 Software Analysis and Design: a software system that helps a
         vehicle dealership run its day-to-day business. It tracks the vehicles a dealership buys from
         vendors, the customers it sells to, the money owed in each direction, the bank accounts that
         money moves through, and the resulting profit and loss.
@@ -169,8 +179,8 @@
         <li><a href="#er">1. Entity Relationship Diagram</a></li>
         <li><a href="#usecase">2. Use Case Diagrams</a> <span class="note">(Create Sales Invoice, Purchase Vehicle)</span></li>
         <li><a href="#activity">3. Activity Diagrams</a> <span class="note">(Create Invoice, Purchase Vehicle)</span></li>
-        <li><a href="#crc">4. CRC Cards</a> <span class="note">(Phase 5, Phase 8, Phase 9)</span></li>
-        <li><a href="#class">5. Class Diagrams</a> <span class="note">(Sales, Purchasing and Inventory; Banking; Reporting)</span></li>
+        <li><a href="#crc">4. CRC Cards</a> <span class="note">(Phases 1–9 slideshow)</span></li>
+        <li><a href="#class">5. Class Diagrams</a> <span class="note">(Phases 1–9 slideshow)</span></li>
       </ul>
     </div>
   </section>
@@ -182,7 +192,7 @@
       <figcaption>Updated ERD
         <span>All entities from vendors and vehicles through sales, AR/AP, bank accounts, the internal ledger and statement lines.</span>
       </figcaption>
-      <a class="img-link" href="artifacts/er-diagram.png"><img src="artifacts/er-diagram.png" alt="AutoPlex Motors updated entity relationship diagram"></a>
+      <a class="img-link" href="artifacts/ERD%20Bank_StatementLine_Updated.png"><img src="artifacts/ERD%20Bank_StatementLine_Updated.png" alt="AutoPlex Motors updated entity relationship diagram"></a>
     </figure>
   </section>
 
@@ -194,13 +204,13 @@
         <figcaption>Create Sales Invoice
           <span>Actors: Salesperson, Customer.</span>
         </figcaption>
-        <a class="img-link" href="artifacts/usecase-create-sales-invoice.png"><img src="artifacts/usecase-create-sales-invoice.png" alt="Use case diagram: Create Sales Invoice"></a>
+        <a class="img-link" href="artifacts/Create%20Invoice.png"><img src="artifacts/Create%20Invoice.png" alt="Use case diagram: Create Sales Invoice"></a>
       </figure>
       <figure class="artifact">
         <figcaption>Purchase Vehicle
           <span>Actors: Purchasing Staff, Vendor.</span>
         </figcaption>
-        <a class="img-link" href="artifacts/usecase-purchase-vehicle.png"><img src="artifacts/usecase-purchase-vehicle.png" alt="Use case diagram: Purchase Vehicle"></a>
+        <a class="img-link" href="artifacts/purchase%20Vehicle.png"><img src="artifacts/purchase%20Vehicle.png" alt="Use case diagram: Purchase Vehicle"></a>
       </figure>
     </div>
   </section>
@@ -213,13 +223,13 @@
         <figcaption>Create Invoice
           <span>Select customer and vehicle, enter price, taxes and fees, validate, then save, create AR invoice and mark vehicle sold.</span>
         </figcaption>
-        <a class="img-link" href="artifacts/activity-create-invoice.png"><img src="artifacts/activity-create-invoice.png" alt="Activity diagram: Create Invoice"></a>
+        <a class="img-link" href="artifacts/activityCreateInvoice.png"><img src="artifacts/activityCreateInvoice.png" alt="Activity diagram: Create Invoice"></a>
       </figure>
       <figure class="artifact">
         <figcaption>Purchase Vehicle
           <span>Select vendor, enter details and cost, validate, then add to inventory, create AP bill and mark available.</span>
         </figcaption>
-        <a class="img-link" href="artifacts/activity-purchase-vehicle.png"><img src="artifacts/activity-purchase-vehicle.png" alt="Activity diagram: Purchase Vehicle"></a>
+        <a class="img-link" href="artifacts/activityPurchaseVehicle.png"><img src="artifacts/activityPurchaseVehicle.png" alt="Activity diagram: Purchase Vehicle"></a>
       </figure>
     </div>
   </section>
@@ -227,58 +237,100 @@
   <!-- 4. CRC -->
   <section id="crc">
     <h2>4. CRC Cards</h2>
-    <div class="group">
-      <figure class="artifact">
-        <figcaption>Phase 5: Accounts Payable
-          <span>APBill and VendorPayment responsibilities and collaborators.</span>
-        </figcaption>
-        <a class="img-link" href="artifacts/crc-phase5-accounts-payable.png"><img src="artifacts/crc-phase5-accounts-payable.png" alt="CRC cards for Phase 5: Accounts Payable"></a>
+    <div class="slideshow" aria-label="CRC cards by project phase">
+      <figure class="artifact slide active">
+        <figcaption>Phase 1: Master Data</figcaption>
+        <a class="img-link" href="artifacts/CRCPhase1.png"><img src="artifacts/CRCPhase1.png" alt="CRC cards for Phase 1: Master Data"></a>
       </figure>
-    </div>
-    <div class="group">
-      <figure class="artifact">
-        <figcaption>Phase 8: Reconciliation
-          <span>BankReconciliation with its collaborators.</span>
-        </figcaption>
-        <a class="img-link" href="artifacts/crc-phase8-reconciliation.png"><img src="artifacts/crc-phase8-reconciliation.png" alt="CRC cards for Phase 8: Reconciliation"></a>
+      <figure class="artifact slide">
+        <figcaption>Phase 2: Inventory</figcaption>
+        <a class="img-link" href="artifacts/CRCPhase2.png"><img src="artifacts/CRCPhase2.png" alt="CRC cards for Phase 2: Inventory"></a>
       </figure>
-    </div>
-    <div class="group">
-      <figure class="artifact">
-        <figcaption>Phase 9: Reporting
-          <span>ProfitLossReport and the earlier-phase classes it reads.</span>
-        </figcaption>
-        <a class="img-link" href="artifacts/crc-phase9-reporting.png"><img src="artifacts/crc-phase9-reporting.png" alt="CRC cards for Phase 9: Reporting"></a>
+      <figure class="artifact slide">
+        <figcaption>Phase 3: Sales</figcaption>
+        <a class="img-link" href="artifacts/CRCPhase3.png"><img src="artifacts/CRCPhase3.png" alt="CRC cards for Phase 3: Sales"></a>
       </figure>
+      <figure class="artifact slide">
+        <figcaption>Phase 4: Accounts Receivable</figcaption>
+        <a class="img-link" href="artifacts/CRCPhase4.png"><img src="artifacts/CRCPhase4.png" alt="CRC cards for Phase 4: Accounts Receivable"></a>
+      </figure>
+      <figure class="artifact slide">
+        <figcaption>Phase 5: Accounts Payable</figcaption>
+        <a class="img-link" href="artifacts/CRCPhase5.png"><img src="artifacts/CRCPhase5.png" alt="CRC cards for Phase 5: Accounts Payable"></a>
+      </figure>
+      <figure class="artifact slide">
+        <figcaption>Phase 6: Banking</figcaption>
+        <a class="img-link" href="artifacts/CRCPhase6.png"><img src="artifacts/CRCPhase6.png" alt="CRC cards for Phase 6: Banking"></a>
+      </figure>
+      <figure class="artifact slide">
+        <figcaption>Phase 6B: Banking</figcaption>
+        <a class="img-link" href="artifacts/CRCPhase6B.png"><img src="artifacts/CRCPhase6B.png" alt="CRC cards for Phase 6B: Banking"></a>
+      </figure>
+      <figure class="artifact slide">
+        <figcaption>Phase 7: Banking</figcaption>
+        <a class="img-link" href="artifacts/CRCPhase7.png"><img src="artifacts/CRCPhase7.png" alt="CRC cards for Phase 7: Banking"></a>
+      </figure>
+      <figure class="artifact slide">
+        <figcaption>Phase 8: Reconciliation</figcaption>
+        <a class="img-link" href="artifacts/CRCPhase8.png"><img src="artifacts/CRCPhase8.png" alt="CRC cards for Phase 8: Reconciliation"></a>
+      </figure>
+      <figure class="artifact slide">
+        <figcaption>Phase 9: Reporting</figcaption>
+        <a class="img-link" href="artifacts/CRCPhase9.png"><img src="artifacts/CRCPhase9.png" alt="CRC cards for Phase 9: Reporting"></a>
+      </figure>
+      <div class="slide-controls">
+        <button class="slide-button" type="button" id="crcPrevious" aria-label="Show previous CRC phase">Previous</button>
+        <span class="slide-indicator" id="crcIndicator" aria-live="polite">Phase 1 of 10</span>
+        <button class="slide-button" type="button" id="crcNext" aria-label="Show next CRC phase">Next</button>
+      </div>
     </div>
   </section>
 
   <!-- 5. CLASS -->
   <section id="class">
     <h2>5. Class Diagrams</h2>
-    <div class="group">
-      <figure class="artifact">
-        <figcaption>Class Diagram 1: Sales, Purchasing and Inventory (Phase 5)
-          <span>Vendor, Vehicle, Part, APBill, VendorPayment, Customer, Employee, SalesInvoice, ARInvoice, CustomerPayment and their enums.</span>
-        </figcaption>
-        <a class="img-link" href="artifacts/class-diagram-1-sales-purchasing-inventory.png"><img src="artifacts/class-diagram-1-sales-purchasing-inventory.png" alt="Class diagram 1: Sales, Purchasing and Inventory"></a>
+    <div class="slideshow" aria-label="Class diagrams by project phase">
+      <figure class="artifact slide active">
+        <figcaption>Class Diagram: Phase 1</figcaption>
+        <a class="img-link" href="artifacts/autoplex_class_1_sales_purchasing_phase1.png"><img src="artifacts/autoplex_class_1_sales_purchasing_phase1.png" alt="Class diagram for Phase 1"></a>
       </figure>
-    </div>
-    <div class="group">
-      <figure class="artifact">
-        <figcaption>Class Diagram 2: Banking (Phase 8)
-          <span>Bank, BankAccount, BankReceipt, BankPayment, Transaction, BankStatementLine and the reconciliation classes.</span>
-        </figcaption>
-        <a class="img-link" href="artifacts/class-diagram-2-banking.png"><img src="artifacts/class-diagram-2-banking.png" alt="Class diagram 2: Banking"></a>
+      <figure class="artifact slide">
+        <figcaption>Class Diagram: Phase 2</figcaption>
+        <a class="img-link" href="artifacts/autoplex_class_1_sales_purchasing_phase2.png"><img src="artifacts/autoplex_class_1_sales_purchasing_phase2.png" alt="Class diagram for Phase 2"></a>
       </figure>
-    </div>
-    <div class="group">
-      <figure class="artifact">
-        <figcaption>Class Diagram 3: Reporting (Phase 9)
-          <span>ProfitAndLossReport, report components, PeriodComparison, DrillDownRecord and ReportExport.</span>
-        </figcaption>
-        <a class="img-link" href="artifacts/class-diagram-3-reporting.png"><img src="artifacts/class-diagram-3-reporting.png" alt="Class diagram 3: Reporting"></a>
+      <figure class="artifact slide">
+        <figcaption>Class Diagram: Phase 3</figcaption>
+        <a class="img-link" href="artifacts/autoplex_class_1_sales_purchasing_phase3.png"><img src="artifacts/autoplex_class_1_sales_purchasing_phase3.png" alt="Class diagram for Phase 3"></a>
       </figure>
+      <figure class="artifact slide">
+        <figcaption>Class Diagram: Phase 4</figcaption>
+        <a class="img-link" href="artifacts/autoplex_class_1_sales_purchasing_phase4.png"><img src="artifacts/autoplex_class_1_sales_purchasing_phase4.png" alt="Class diagram for Phase 4"></a>
+      </figure>
+      <figure class="artifact slide">
+        <figcaption>Class Diagram: Phase 5</figcaption>
+        <a class="img-link" href="artifacts/autoplex_class_1_sales_purchasing_phase5.png"><img src="artifacts/autoplex_class_1_sales_purchasing_phase5.png" alt="Class diagram for Phase 5"></a>
+      </figure>
+      <figure class="artifact slide">
+        <figcaption>Class Diagram: Phase 6</figcaption>
+        <a class="img-link" href="artifacts/autoplex_class_2_banking_phase6.png"><img src="artifacts/autoplex_class_2_banking_phase6.png" alt="Class diagram for Phase 6"></a>
+      </figure>
+      <figure class="artifact slide">
+        <figcaption>Class Diagram: Phase 7</figcaption>
+        <a class="img-link" href="artifacts/autoplex_class_2_banking_phase7.png"><img src="artifacts/autoplex_class_2_banking_phase7.png" alt="Class diagram for Phase 7"></a>
+      </figure>
+      <figure class="artifact slide">
+        <figcaption>Class Diagram: Phase 8</figcaption>
+        <a class="img-link" href="artifacts/autoplex_class_2_banking_phase8.png"><img src="artifacts/autoplex_class_2_banking_phase8.png" alt="Class diagram for Phase 8"></a>
+      </figure>
+      <figure class="artifact slide">
+        <figcaption>Class Diagram: Phase 9</figcaption>
+        <a class="img-link" href="artifacts/autoplex_class_3_reporting_phase9.png"><img src="artifacts/autoplex_class_3_reporting_phase9.png" alt="Class diagram for Phase 9"></a>
+      </figure>
+      <div class="slide-controls">
+        <button class="slide-button" type="button" id="classPrevious" aria-label="Show previous class diagram">Previous</button>
+        <span class="slide-indicator" id="classIndicator" aria-live="polite">Diagram 1 of 9</span>
+        <button class="slide-button" type="button" id="classNext" aria-label="Show next class diagram">Next</button>
+      </div>
     </div>
   </section>
 
@@ -301,6 +353,33 @@
 <footer>
   AutoPlex Motors term project &middot; Hosted on GitHub Pages
 </footer>
+
+<script>
+  (() => {
+    const initializeSlideshow = (sectionId, previousId, nextId, indicatorId, label) => {
+      const slides = Array.from(document.querySelectorAll(`#${sectionId} .slide`));
+      const previousButton = document.getElementById(previousId);
+      const nextButton = document.getElementById(nextId);
+      const indicator = document.getElementById(indicatorId);
+      let currentSlide = 0;
+
+      const showSlide = (slideIndex) => {
+        currentSlide = (slideIndex + slides.length) % slides.length;
+        slides.forEach((slide, index) => {
+          slide.classList.toggle('active', index === currentSlide);
+        });
+        indicator.textContent = `${label} ${currentSlide + 1} of ${slides.length}`;
+      };
+
+      previousButton.addEventListener('click', () => showSlide(currentSlide - 1));
+      nextButton.addEventListener('click', () => showSlide(currentSlide + 1));
+      showSlide(0);
+    };
+
+    initializeSlideshow('crc', 'crcPrevious', 'crcNext', 'crcIndicator', 'Phase');
+    initializeSlideshow('class', 'classPrevious', 'classNext', 'classIndicator', 'Diagram');
+  })();
+</script>
 
 </body>
 </html>
