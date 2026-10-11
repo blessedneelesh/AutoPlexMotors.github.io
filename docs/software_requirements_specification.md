@@ -1,6 +1,8 @@
 # Overview
 
-This document is the prototype Software Requirements Specification (SRS) for AutoPlex Motors, a dealership management system covering master data (customers, employees, vendors), vehicle and parts inventory, sales invoicing, accounts receivable and payable, banking, simulated bank statements and reconciliation, and Profit & Loss reporting. It converts the 36 incremental user stories into testable "shall" requirements and groups them by feature (for example, everything about the customer form sits under one "Customer Management" feature). **How to read it:** features are numbered in delivery order; each requirement has an ID (`FR-` functional, `NFR-` non-functional) and ends with the user story it came from in brackets, e.g. *[S8]* = Story 8. Requirements under a feature may rely on earlier features only, matching the story dependency order. Markdown does not render nested numbering (1.1, 1.2) well, so the ID is the reliable way to refer to a requirement.
+This document is the Software Requirements Specification (SRS) for AutoPlex Motors, a dealership management system covering master data (customers, employees, vendors), vehicle and parts inventory, sales invoicing, accounts receivable and payable, banking, simulated bank statements and reconciliation, and Profit & Loss reporting. It converts the 36 incremental user stories into testable "shall" requirements and groups them by feature (for example, everything about the customer form sits under one "Customer Management" feature). 
+
+**How to read it:** features are numbered in delivery order; each requirement has an ID (`FR-` functional, `NFR-` non-functional) and ends with the user story it came from in brackets, e.g. *[S8]* = Story 8. Requirements under a feature may rely on earlier features only, matching the story dependency order. Markdown does not render nested numbering (1.1, 1.2) well, so the ID is the reliable way to refer to a requirement.
 
 # Functional Requirements
 
