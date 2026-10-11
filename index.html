@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AutoPlex Motors | Term Project</title>
+  <meta name="description" content="Term project site for AutoPlex Motors: a dealership sales, purchasing, banking and reporting system.">
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --surface: #ffffff;
+      --text: #1d2433;
+      --muted: #5b6577;
+      --accent: #1f4fd8;
+      --accent-dark: #14349a;
+      --border: #dde3ee;
+      --shadow: 0 2px 10px rgba(20, 40, 90, 0.08);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f1420;
+        --surface: #171e2e;
+        --text: #e6eaf3;
+        --muted: #9aa5ba;
+        --accent: #6e9bff;
+        --accent-dark: #a9c2ff;
+        --border: #2a3450;
+        --shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+      }
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    a { color: var(--accent); }
+    header.hero {
+      background: linear-gradient(135deg, #14349a, #1f4fd8 60%, #3a7bff);
+      color: #fff;
+      padding: 56px 20px 48px;
+      text-align: center;
+    }
+    header.hero h1 { margin: 0 0 8px; font-size: 2.4rem; letter-spacing: .5px; }
+    header.hero p { margin: 0 auto; max-width: 720px; font-size: 1.1rem; opacity: .95; }
+    nav {
+      position: sticky; top: 0; z-index: 10;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 18px;
+      padding: 10px 16px;
+    }
+    nav a { text-decoration: none; font-weight: 600; font-size: .95rem; padding: 4px 6px; }
+    nav a:hover { text-decoration: underline; }
+    main { max-width: 1100px; margin: 0 auto; padding: 32px 20px 64px; }
+    section { margin-bottom: 48px; scroll-margin-top: 70px; }
+    h2 {
+      font-size: 1.7rem; margin: 0 0 16px;
+      padding-bottom: 8px; border-bottom: 3px solid var(--accent);
+    }
+    h3 { margin: 28px 0 8px; font-size: 1.2rem; }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      padding: 20px 24px;
+    }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+    .grid .card h4 { margin: 0 0 6px; color: var(--accent-dark); }
+    .grid .card p { margin: 0; color: var(--muted); font-size: .95rem; }
+    ul.links { list-style: none; padding: 0; margin: 0; }
+    ul.links li { padding: 8px 0; border-bottom: 1px solid var(--border); }
+    ul.links li:last-child { border-bottom: none; }
+    ul.links .note { color: var(--muted); font-size: .9rem; }
+    figure.artifact {
+      margin: 0 0 28px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+    figure.artifact figcaption { font-weight: 600; margin-bottom: 10px; }
+    figure.artifact figcaption span { display: block; font-weight: 400; color: var(--muted); font-size: .92rem; }
+    figure.artifact a.img-link { display: block; overflow-x: auto; background: #fff; border-radius: 6px; border: 1px solid var(--border); }
+    figure.artifact img { display: block; max-width: 100%; height: auto; margin: 0 auto; }
+    .pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+    .pair figure.artifact { margin-bottom: 0; }
+    .group { margin-bottom: 36px; }
+    footer {
+      text-align: center; padding: 24px 16px; color: var(--muted);
+      border-top: 1px solid var(--border); font-size: .9rem;
+    }
+    @media (max-width: 600px) {
+      header.hero h1 { font-size: 1.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="hero">
+  <h1>AutoPlex Motors</h1>
+  <p>A vehicle dealership management system covering purchasing, inventory, sales, receivables and payables, banking, reconciliation and profit and loss reporting.</p>
+</header>
+
+<nav>
+  <a href="#overview">Overview</a>
+  <a href="#artifacts">Artifacts</a>
+  <a href="#er">ER</a>
+  <a href="#usecase">Use Case</a>
+  <a href="#activity">Activity</a>
+  <a href="#crc">CRC</a>
+  <a href="#class">Class</a>
+  <a href="#docs">Docs</a>
+</nav>
+
+<main>
+
+  <!-- 1. HOME / PROJECT OVERVIEW -->
+  <section id="overview">
+    <h2>Project Overview</h2>
+    <div class="card">
+      <p>
+        <strong>AutoPlex Motors</strong> is the term project for this course: a software system that helps a
+        vehicle dealership run its day-to-day business. It tracks the vehicles a dealership buys from
+        vendors, the customers it sells to, the money owed in each direction, the bank accounts that
+        money moves through, and the resulting profit and loss.
+      </p>
+      <p>
+        The system was designed in phases. Each phase adds a layer of data and rules on top of the one
+        before it, from master data up through financial reporting.
+      </p>
+    </div>
+
+    <h3>Scope by phase</h3>
+    <div class="grid">
+      <div class="card"><h4>Phase 1: Master data</h4><p>Customers, employees and vendors.</p></div>
+      <div class="card"><h4>Phase 2: Inventory</h4><p>Vehicles (with status Available, Reserved, Sold) and parts.</p></div>
+      <div class="card"><h4>Phase 3: Sales</h4><p>Sales invoices with draft, post and cancel rules; payment conditions of paid in full, partial or credit.</p></div>
+      <div class="card"><h4>Phase 4: Accounts receivable</h4><p>AR invoices, customer payments, aging and overdue tracking.</p></div>
+      <div class="card"><h4>Phase 5: Accounts payable</h4><p>AP bills and vendor payments created when a purchase leaves a balance.</p></div>
+      <div class="card"><h4>Phases 6 and 7: Banking</h4><p>Banks, bank accounts, receipts, payments, the internal transaction ledger and simulated bank statements.</p></div>
+      <div class="card"><h4>Phase 8: Reconciliation</h4><p>Match ledger transactions to statement lines, confirm matches, reset with a reason and post adjustments.</p></div>
+      <div class="card"><h4>Phase 9: Reporting</h4><p>Profit and loss with revenue, COGS and operating expenses, period comparison, drill-down and export.</p></div>
+    </div>
+
+    <h3>Key business flows</h3>
+    <div class="card">
+      <ul>
+        <li><strong>Purchase a vehicle:</strong> choose a vendor, enter details and cost, add the vehicle to inventory as Available, and create an AP bill when a vendor balance remains.</li>
+        <li><strong>Create a sales invoice:</strong> choose a customer and an available vehicle, enter price, taxes and fees, validate, save, create an AR invoice when a balance remains, and mark the vehicle Sold.</li>
+        <li><strong>Reconcile the bank:</strong> compare posted transactions with statement lines, confirm matches and post statement-only adjustments.</li>
+        <li><strong>Report:</strong> generate a profit and loss for a month, quarter or year to date and drill down to the source records.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 2. ARTIFACTS -->
+  <section id="artifacts">
+    <h2>Project Artifacts</h2>
+    <p>Diagrams are shown in the order they were produced: ER, Use Case, Activity, CRC, then Class. Click any image to open it at full size.</p>
+    <div class="card">
+      <ul class="links">
+        <li><a href="#er">1. Entity Relationship Diagram</a></li>
+        <li><a href="#usecase">2. Use Case Diagrams</a> <span class="note">(Create Sales Invoice, Purchase Vehicle)</span></li>
+        <li><a href="#activity">3. Activity Diagrams</a> <span class="note">(Create Invoice, Purchase Vehicle)</span></li>
+        <li><a href="#crc">4. CRC Cards</a> <span class="note">(Phase 5, Phase 8, Phase 9)</span></li>
+        <li><a href="#class">5. Class Diagrams</a> <span class="note">(Sales, Purchasing and Inventory; Banking; Reporting)</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 1. ER -->
+  <section id="er">
+    <h2>1. Entity Relationship Diagram</h2>
+    <figure class="artifact">
+      <figcaption>Updated ERD
+        <span>All entities from vendors and vehicles through sales, AR/AP, bank accounts, the internal ledger and statement lines.</span>
+      </figcaption>
+      <a class="img-link" href="artifacts/er-diagram.png"><img src="artifacts/er-diagram.png" alt="AutoPlex Motors updated entity relationship diagram"></a>
+    </figure>
+  </section>
+
+  <!-- 2. USE CASE -->
+  <section id="usecase">
+    <h2>2. Use Case Diagrams</h2>
+    <div class="pair">
+      <figure class="artifact">
+        <figcaption>Create Sales Invoice
+          <span>Actors: Salesperson, Customer.</span>
+        </figcaption>
+        <a class="img-link" href="artifacts/usecase-create-sales-invoice.png"><img src="artifacts/usecase-create-sales-invoice.png" alt="Use case diagram: Create Sales Invoice"></a>
+      </figure>
+      <figure class="artifact">
+        <figcaption>Purchase Vehicle
+          <span>Actors: Purchasing Staff, Vendor.</span>
+        </figcaption>
+        <a class="img-link" href="artifacts/usecase-purchase-vehicle.png"><img src="artifacts/usecase-purchase-vehicle.png" alt="Use case diagram: Purchase Vehicle"></a>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 3. ACTIVITY -->
+  <section id="activity">
+    <h2>3. Activity Diagrams</h2>
+    <div class="pair">
+      <figure class="artifact">
+        <figcaption>Create Invoice
+          <span>Select customer and vehicle, enter price, taxes and fees, validate, then save, create AR invoice and mark vehicle sold.</span>
+        </figcaption>
+        <a class="img-link" href="artifacts/activity-create-invoice.png"><img src="artifacts/activity-create-invoice.png" alt="Activity diagram: Create Invoice"></a>
+      </figure>
+      <figure class="artifact">
+        <figcaption>Purchase Vehicle
+          <span>Select vendor, enter details and cost, validate, then add to inventory, create AP bill and mark available.</span>
+        </figcaption>
+        <a class="img-link" href="artifacts/activity-purchase-vehicle.png"><img src="artifacts/activity-purchase-vehicle.png" alt="Activity diagram: Purchase Vehicle"></a>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 4. CRC -->
+  <section id="crc">
+    <h2>4. CRC Cards</h2>
+    <div class="group">
+      <figure class="artifact">
+        <figcaption>Phase 5: Accounts Payable
+          <span>APBill and VendorPayment responsibilities and collaborators.</span>
+        </figcaption>
+        <a class="img-link" href="artifacts/crc-phase5-accounts-payable.png"><img src="artifacts/crc-phase5-accounts-payable.png" alt="CRC cards for Phase 5: Accounts Payable"></a>
+      </figure>
+    </div>
+    <div class="group">
+      <figure class="artifact">
+        <figcaption>Phase 8: Reconciliation
+          <span>BankReconciliation with its collaborators.</span>
+        </figcaption>
+        <a class="img-link" href="artifacts/crc-phase8-reconciliation.png"><img src="artifacts/crc-phase8-reconciliation.png" alt="CRC cards for Phase 8: Reconciliation"></a>
+      </figure>
+    </div>
+    <div class="group">
+      <figure class="artifact">
+        <figcaption>Phase 9: Reporting
+          <span>ProfitLossReport and the earlier-phase classes it reads.</span>
+        </figcaption>
+        <a class="img-link" href="artifacts/crc-phase9-reporting.png"><img src="artifacts/crc-phase9-reporting.png" alt="CRC cards for Phase 9: Reporting"></a>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 5. CLASS -->
+  <section id="class">
+    <h2>5. Class Diagrams</h2>
+    <div class="group">
+      <figure class="artifact">
+        <figcaption>Class Diagram 1: Sales, Purchasing and Inventory (Phase 5)
+          <span>Vendor, Vehicle, Part, APBill, VendorPayment, Customer, Employee, SalesInvoice, ARInvoice, CustomerPayment and their enums.</span>
+        </figcaption>
+        <a class="img-link" href="artifacts/class-diagram-1-sales-purchasing-inventory.png"><img src="artifacts/class-diagram-1-sales-purchasing-inventory.png" alt="Class diagram 1: Sales, Purchasing and Inventory"></a>
+      </figure>
+    </div>
+    <div class="group">
+      <figure class="artifact">
+        <figcaption>Class Diagram 2: Banking (Phase 8)
+          <span>Bank, BankAccount, BankReceipt, BankPayment, Transaction, BankStatementLine and the reconciliation classes.</span>
+        </figcaption>
+        <a class="img-link" href="artifacts/class-diagram-2-banking.png"><img src="artifacts/class-diagram-2-banking.png" alt="Class diagram 2: Banking"></a>
+      </figure>
+    </div>
+    <div class="group">
+      <figure class="artifact">
+        <figcaption>Class Diagram 3: Reporting (Phase 9)
+          <span>ProfitAndLossReport, report components, PeriodComparison, DrillDownRecord and ReportExport.</span>
+        </figcaption>
+        <a class="img-link" href="artifacts/class-diagram-3-reporting.png"><img src="artifacts/class-diagram-3-reporting.png" alt="Class diagram 3: Reporting"></a>
+      </figure>
+    </div>
+  </section>
+
+  <!-- DOCS -->
+  <section id="docs">
+    <h2>Project Documents</h2>
+    <div class="card">
+      <p>Documents from the <code>docs</code> folder of this repository.</p>
+      <ul class="links">
+        <li><a href="docs/project-proposal.pdf">Project Proposal</a></li>
+        <li><a href="docs/requirements.pdf">Requirements and User Stories</a></li>
+        <li><a href="docs/project-plan.pdf">Project Plan and Timeline</a></li>
+        <li><a href="docs/README.md">Docs folder README</a></li>
+      </ul>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  AutoPlex Motors term project &middot; Hosted on GitHub Pages
+</footer>
+
+</body>
+</html>
