@@ -102,6 +102,7 @@
     .pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
     .pair figure.artifact { margin-bottom: 0; }
     .group { margin-bottom: 36px; }
+    .card p.note { margin: 0; color: var(--muted); }
     footer {
       text-align: center; padding: 24px 16px; color: var(--muted);
       border-top: 1px solid var(--border); font-size: .9rem;
@@ -115,17 +116,20 @@
 
 <header class="hero">
   <h1>AutoPlex Motors</h1>
-  <p>A vehicle dealership management system covering purchasing, inventory, sales, receivables and payables, banking, reconciliation and profit and loss reporting.</p>
+  <p>A vehicle dealership management system covering inventory, banking, sales, receivables and payables, corrections, statement adjustments, and profit and loss reporting.</p>
 </header>
 
 <nav>
   <a href="#overview">Overview</a>
+  <a href="#stories">User Stories</a>
   <a href="#artifacts">Artifacts</a>
   <a href="#er">ERD</a>
   <a href="#usecase">Use Cases</a>
   <a href="#activity">Activity Diagrams</a>
-  <a href="#crc">CRC Cards</a>
   <a href="#class">Class Diagrams</a>
+  <a href="#sequence">Sequence Diagrams</a>
+  <a href="#statemachine">State Machine</a>
+  <a href="#object">Object Diagrams</a>
   <a href="#docs">Documents</a>
 </nav>
 
@@ -142,30 +146,74 @@
         direction, the bank accounts through which money moves, and the resulting profit and loss.
       </p>
       <p>
-        The system was designed in phases. Each phase builds on the previous one by adding data and
-        business rules, from master data through financial reporting.
+        The system is delivered as 31 small, incremental user stories in nine phases. Each story can be
+        built, tested, and merged on its own and depends only on earlier stories. Banking is built
+        <em>before</em> receivables and payables, so every customer payment is saved directly as a
+        Bank Receipt and every vendor payment directly as a Bank Payment. No temporary payment
+        tables are needed and nothing has to be migrated later.
       </p>
     </div>
 
     <h3>Scope by phase</h3>
     <div class="grid">
-      <div class="card"><h4>Phase 1: Master data</h4><p>Customers, employees and vendors.</p></div>
-      <div class="card"><h4>Phase 2: Inventory</h4><p>Vehicles with Available, Reserved, or Sold status, along with parts.</p></div>
-      <div class="card"><h4>Phase 3: Sales</h4><p>Sales invoices with draft, posting, and cancellation rules; payment statuses of paid in full, partially paid, or credit.</p></div>
-      <div class="card"><h4>Phase 4: Accounts receivable</h4><p>AR invoices, customer payments, aging and overdue tracking.</p></div>
-      <div class="card"><h4>Phase 5: Accounts payable</h4><p>AP bills and vendor payments created when a purchase leaves a balance.</p></div>
-      <div class="card"><h4>Phases 6 and 7: Banking</h4><p>Banks, bank accounts, receipts, payments, the internal transaction ledger and simulated bank statements.</p></div>
-      <div class="card"><h4>Phase 8: Reconciliation</h4><p>Match ledger transactions to statement lines, confirm matches, reset them with a reason, and post adjustments.</p></div>
-      <div class="card"><h4>Phase 9: Reporting</h4><p>Profit and loss reporting with revenue, COGS, and operating expenses, plus period comparison, drill-down, and export.</p></div>
+      <div class="card"><h4>Phase 1: Master data</h4><p>Customers, employees, and vendors, each with Active or Inactive status.</p></div>
+      <div class="card"><h4>Phase 2: Inventory</h4><p>Vehicles with total acquisition cost, potential profit and margin, plus parts with low-stock tracking.</p></div>
+      <div class="card"><h4>Phase 3: Banking foundation</h4><p>Banks and bank accounts (including Cash on hand), the internal transaction ledger, simulated statement lines, and transfers between accounts.</p></div>
+      <div class="card"><h4>Phase 4: Sales invoice</h4><p>Draft, post, and cancel sales invoices. Posting marks the vehicle as Sold so it cannot be sold twice.</p></div>
+      <div class="card"><h4>Phase 5: Accounts receivable</h4><p>Paid in full, partial, or credit sales. Bank Receipts are posted, AR is created only when a balance remains, and AR aging and customer balances are tracked.</p></div>
+      <div class="card"><h4>Phase 6: Accounts payable</h4><p>The payment condition on vehicle purchases. Bank Payments are posted, AP Bills are created only when a vendor balance remains, and AP aging is tracked.</p></div>
+      <div class="card"><h4>Phase 7: Corrections</h4><p>Reverse an incorrect receipt or payment with a reason, restoring bank, AR, and AP balances.</p></div>
+      <div class="card"><h4>Phase 8: Statement adjustments</h4><p>Statement-only bank activity (interest, charges, refunds) and adjustments posted to both the statement and the books.</p></div>
+      <div class="card"><h4>Phase 9: Reporting</h4><p>Revenue, COGS, operating expenses, and the Profit &amp; Loss report, with period comparison, drill-down, and export.</p></div>
     </div>
 
     <h3>Key business flows</h3>
     <div class="card">
       <ul>
-        <li><strong>Purchase a vehicle:</strong> choose a vendor, enter the vehicle details and cost, add the vehicle to inventory as Available, and create an AP bill when a vendor balance remains.</li>
-        <li><strong>Create a sales invoice:</strong> choose a customer and an available vehicle, enter the price, taxes, and fees, validate and save the invoice, create an AR invoice when a balance remains, and mark the vehicle as Sold.</li>
-        <li><strong>Reconcile the bank:</strong> compare posted transactions with statement lines, confirm matches and post statement-only adjustments.</li>
-        <li><strong>Report:</strong> generate a profit and loss report for a month, quarter, or year-to-date period and drill down to the source records.</li>
+        <li><strong>Purchase a vehicle:</strong> choose a vendor, enter the vehicle details, purchase price, and additional costs, and add the vehicle to inventory as Available. Record whether it was paid in full, partially, or on credit. Any amount paid now is posted as a Bank Payment, and an AP Bill is created only when a vendor balance remains.</li>
+        <li><strong>Sell a vehicle:</strong> choose a customer, an available vehicle, and a salesperson, enter the price, discount, tax, and fees, then save a Draft invoice. Posting the invoice marks the vehicle as Sold. Any amount received is posted as a Bank Receipt, and an AR Invoice is created only when a balance remains.</li>
+        <li><strong>Move money:</strong> every receipt, payment, transfer, adjustment, and reversal posts exactly one internal Transaction and one simulated statement line, and updates the account's book balance.</li>
+        <li><strong>Report:</strong> generate a Profit &amp; Loss report for a month, quarter, or year to date, compare it with a previous period, drill down to the source records, and export it.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- USER STORIES -->
+  <section id="stories">
+    <h2>Incremental User Stories</h2>
+
+    <h3>Delivery sequence</h3>
+    <div class="grid">
+      <div class="card"><h4>Phase 1: Master data</h4><p>1 Manage customers<br>2 Manage employees<br>3 Manage vendors</p></div>
+      <div class="card"><h4>Phase 2: Inventory</h4><p>4 Add a vehicle to inventory<br>5 Browse vehicle inventory<br>6 Manage parts inventory</p></div>
+      <div class="card"><h4>Phase 3: Banking foundation</h4><p>7 Banks and bank accounts<br>8 Internal transaction ledger<br>9 Simulated statement lines<br>10 Transfer between accounts</p></div>
+      <div class="card"><h4>Phase 4: Sales invoice</h4><p>11 Create a draft sales invoice<br>12 Post a sales invoice<br>13 Cancel and browse sales invoices<br>View a customer's sales invoices</p></div>
+      <div class="card"><h4>Phase 5: Accounts receivable</h4><p>14 Payment condition, receipt, and AR<br>15 Record a later customer payment<br>16 Record a receipt not linked to AR<br>17 AR list and aging<br>18 Customer balances</p></div>
+      <div class="card"><h4>Phase 6: Accounts payable</h4><p>19 Vehicle purchase payment condition and AP<br>20 Record a later vendor payment<br>21 Record a payment not linked to AP<br>22 AP list and aging</p></div>
+      <div class="card"><h4>Phase 7: Corrections</h4><p>23 Reverse a banking transaction</p></div>
+      <div class="card"><h4>Phase 8: Statement adjustments</h4><p>24 Statement-only adjustment<br>25 Add and post an adjustment</p></div>
+      <div class="card"><h4>Phase 9: Reporting</h4><p>26 Revenue<br>27 COGS<br>28 Operating expenses<br>29 Profit &amp; Loss report<br>30 Compare periods<br>31 Drill-down and export</p></div>
+    </div>
+
+    <h3>Rules that apply to every story</h3>
+    <div class="card">
+      <ul>
+        <li>Posting is atomic: all related records save, or none do.</li>
+        <li>Posted records are reversed or cancelled, never deleted.</li>
+        <li>Money uses decimal arithmetic.</li>
+        <li>Records keep their creation date, user, reference, and status.</li>
+        <li>Validation errors are shown before posting.</li>
+        <li>Every receipt and payment has a bank account. Cash uses a Cash on hand account.</li>
+        <li>Every posted receipt, payment, transfer, and adjustment creates exactly one Transaction and one statement line.</li>
+      </ul>
+    </div>
+
+    <h3>Data model notes</h3>
+    <div class="card">
+      <ul>
+        <li><strong>Bank Receipt</strong> links to the Sales Invoice (<code>salesInvoiceId</code>) and, when one exists, the AR Invoice (<code>arInvoiceId</code>). A fully paid sale has no AR Invoice, so the Sales Invoice link ties its receipt to the sale.</li>
+        <li><strong>Bank Payment</strong> links to the Vehicle (<code>vehicleId</code>) and, when one exists, the AP Bill (<code>apBillId</code>).</li>
+        <li>No Customer Payment or Vendor Payment table is used.</li>
       </ul>
     </div>
   </section>
@@ -173,14 +221,16 @@
   <!-- 2. ARTIFACTS -->
   <section id="artifacts">
     <h2>Project Artifacts</h2>
-    <p>Diagrams are shown in the order in which they were produced: ERD, use-case, activity, CRC, and class diagrams. Click any image to open it at full size.</p>
+    <p>Diagrams are shown in the order in which they were produced: ERD, use case, activity, class, sequence, state machine, and object diagrams. Click any image to open it at full size.</p>
     <div class="card">
       <ul class="links">
         <li><a href="#er">1. Entity Relationship Diagram (ERD)</a></li>
         <li><a href="#usecase">2. Use Case Diagrams</a> <span class="note">(Create Sales Invoice, Purchase Vehicle)</span></li>
         <li><a href="#activity">3. Activity Diagrams</a> <span class="note">(Create Invoice, Purchase Vehicle)</span></li>
-        <li><a href="#crc">4. CRC Cards</a> <span class="note">(Phases 1–9 slideshow)</span></li>
-        <li><a href="#class">5. Class Diagrams</a> <span class="note">(Phases 1–9 slideshow)</span></li>
+        <li><a href="#class">4. Class Diagrams</a> <span class="note">(domain and detailed, by user story)</span></li>
+        <li><a href="#sequence">5. Sequence Diagrams</a> <span class="note">(Stories 8–10, 14–18)</span></li>
+        <li><a href="#statemachine">6. State Machine Diagrams</a> <span class="note">(Vehicle, Stories 14–15)</span></li>
+        <li><a href="#object">7. Object Diagrams</a> <span class="note">(Stories 14–15)</span></li>
       </ul>
     </div>
   </section>
@@ -192,7 +242,7 @@
       <figcaption>Updated ERD
         <span>Includes entities for vendors, vehicles, sales, AR/AP, bank accounts, the internal ledger, and statement lines.</span>
       </figcaption>
-      <a class="img-link" href="artifacts/ERD%20Bank_StatementLine_Updated.png"><img src="artifacts/ERD%20Bank_StatementLine_Updated.png" alt="AutoPlex Motors updated entity relationship diagram"></a>
+      <a class="img-link" href="artifacts/ERDiagram/autoplex_motors_erd_v3.png"><img src="artifacts/ERDiagram/autoplex_motors_erd_v3.png" alt="AutoPlex Motors updated entity relationship diagram"></a>
     </figure>
   </section>
 
@@ -204,13 +254,13 @@
         <figcaption>Create Sales Invoice
           <span>Actors: Salesperson, Customer.</span>
         </figcaption>
-        <a class="img-link" href="artifacts/Create%20Invoice.png"><img src="artifacts/Create%20Invoice.png" alt="Use case diagram: Create Sales Invoice"></a>
+        <a class="img-link" href="artifacts/useCaseDiagram/Create%20Invoice.png"><img src="artifacts/useCaseDiagram/Create%20Invoice.png" alt="Use case diagram: Create Sales Invoice"></a>
       </figure>
       <figure class="artifact">
         <figcaption>Purchase Vehicle
           <span>Actors: Purchasing Staff, Vendor.</span>
         </figcaption>
-        <a class="img-link" href="artifacts/purchase%20Vehicle.png"><img src="artifacts/purchase%20Vehicle.png" alt="Use case diagram: Purchase Vehicle"></a>
+        <a class="img-link" href="artifacts/useCaseDiagram/purchase%20Vehicle.png"><img src="artifacts/useCaseDiagram/purchase%20Vehicle.png" alt="Use case diagram: Purchase Vehicle"></a>
       </figure>
     </div>
   </section>
@@ -223,113 +273,272 @@
         <figcaption>Create Invoice
           <span>Select a customer and vehicle, enter the price, taxes, and fees, validate, save the invoice, create an AR invoice, and mark the vehicle as sold.</span>
         </figcaption>
-        <a class="img-link" href="artifacts/activityCreateInvoice.png"><img src="artifacts/activityCreateInvoice.png" alt="Activity diagram: Create Invoice"></a>
+        <a class="img-link" href="artifacts/activityDiagram/activityCreateInvoice.png"><img src="artifacts/activityDiagram/activityCreateInvoice.png" alt="Activity diagram: Create Invoice"></a>
       </figure>
       <figure class="artifact">
         <figcaption>Purchase Vehicle
           <span>Select a vendor, enter the vehicle details and cost, validate, add the vehicle to inventory, create an AP bill, and mark it as available.</span>
         </figcaption>
-        <a class="img-link" href="artifacts/activityPurchaseVehicle.png"><img src="artifacts/activityPurchaseVehicle.png" alt="Activity diagram: Purchase Vehicle"></a>
+        <a class="img-link" href="artifacts/activityDiagram/activityPurchaseVehicle.png"><img src="artifacts/activityDiagram/activityPurchaseVehicle.png" alt="Activity diagram: Purchase Vehicle"></a>
       </figure>
     </div>
   </section>
 
-  <!-- 4. CRC -->
-  <section id="crc">
-    <h2>4. CRC Cards</h2>
-    <div class="slideshow" aria-label="CRC cards by project phase">
-      <figure class="artifact slide active">
-        <figcaption>Phase 1: Master Data</figcaption>
-        <a class="img-link" href="artifacts/CRCPhase1.png"><img src="artifacts/CRCPhase1.png" alt="CRC cards for Phase 1: Master Data"></a>
-      </figure>
-      <figure class="artifact slide">
-        <figcaption>Phase 2: Inventory</figcaption>
-        <a class="img-link" href="artifacts/CRCPhase2.png"><img src="artifacts/CRCPhase2.png" alt="CRC cards for Phase 2: Inventory"></a>
-      </figure>
-      <figure class="artifact slide">
-        <figcaption>Phase 3: Sales</figcaption>
-        <a class="img-link" href="artifacts/CRCPhase3.png"><img src="artifacts/CRCPhase3.png" alt="CRC cards for Phase 3: Sales"></a>
-      </figure>
-      <figure class="artifact slide">
-        <figcaption>Phase 4: Accounts Receivable</figcaption>
-        <a class="img-link" href="artifacts/CRCPhase4.png"><img src="artifacts/CRCPhase4.png" alt="CRC cards for Phase 4: Accounts Receivable"></a>
-      </figure>
-      <figure class="artifact slide">
-        <figcaption>Phase 5: Accounts Payable</figcaption>
-        <a class="img-link" href="artifacts/CRCPhase5.png"><img src="artifacts/CRCPhase5.png" alt="CRC cards for Phase 5: Accounts Payable"></a>
-      </figure>
-      <figure class="artifact slide">
-        <figcaption>Phase 6: Banking</figcaption>
-        <a class="img-link" href="artifacts/CRCPhase6.png"><img src="artifacts/CRCPhase6.png" alt="CRC cards for Phase 6: Banking"></a>
-      </figure>
-      <figure class="artifact slide">
-        <figcaption>Phase 6B: Banking</figcaption>
-        <a class="img-link" href="artifacts/CRCPhase6B.png"><img src="artifacts/CRCPhase6B.png" alt="CRC cards for Phase 6B: Banking"></a>
-      </figure>
-      <figure class="artifact slide">
-        <figcaption>Phase 7: Banking</figcaption>
-        <a class="img-link" href="artifacts/CRCPhase7.png"><img src="artifacts/CRCPhase7.png" alt="CRC cards for Phase 7: Banking"></a>
-      </figure>
-      <figure class="artifact slide">
-        <figcaption>Phase 8: Reconciliation</figcaption>
-        <a class="img-link" href="artifacts/CRCPhase8.png"><img src="artifacts/CRCPhase8.png" alt="CRC cards for Phase 8: Reconciliation"></a>
-      </figure>
-      <figure class="artifact slide">
-        <figcaption>Phase 9: Reporting</figcaption>
-        <a class="img-link" href="artifacts/CRCPhase9.png"><img src="artifacts/CRCPhase9.png" alt="CRC cards for Phase 9: Reporting"></a>
-      </figure>
-      <div class="slide-controls">
-        <button class="slide-button" type="button" id="crcPrevious" aria-label="Show previous CRC phase">Previous</button>
-        <span class="slide-indicator" id="crcIndicator" aria-live="polite">Phase 1 of 10</span>
-        <button class="slide-button" type="button" id="crcNext" aria-label="Show next CRC phase">Next</button>
+  <!-- 4. CLASS -->
+  <section id="class">
+    <h2>4. Class Diagrams</h2>
+    <div class="group">
+      <h3>Domain class diagrams</h3>
+      <div class="slideshow" id="classDomain" data-label="Diagram" aria-label="Domain class diagrams by user story">
+        <figure class="artifact slide active">
+          <figcaption>Story 1: Manage customers</figcaption>
+          <a class="img-link" href="artifacts/classDiagram/DomainClassDiagram/story1.png"><img src="artifacts/classDiagram/DomainClassDiagram/story1.png" alt="Domain class diagram for Story 1: Manage customers" loading="lazy"></a>
+        </figure>
+        <figure class="artifact slide">
+          <figcaption>Story 2: Manage employees</figcaption>
+          <a class="img-link" href="artifacts/classDiagram/DomainClassDiagram/story2.png"><img src="artifacts/classDiagram/DomainClassDiagram/story2.png" alt="Domain class diagram for Story 2: Manage employees" loading="lazy"></a>
+        </figure>
+        <figure class="artifact slide">
+          <figcaption>Story 3: Manage vendors</figcaption>
+          <a class="img-link" href="artifacts/classDiagram/DomainClassDiagram/story3.png"><img src="artifacts/classDiagram/DomainClassDiagram/story3.png" alt="Domain class diagram for Story 3: Manage vendors" loading="lazy"></a>
+        </figure>
+        <figure class="artifact slide">
+          <figcaption>Story 4: Add a vehicle to inventory</figcaption>
+          <a class="img-link" href="artifacts/classDiagram/DomainClassDiagram/story4.png"><img src="artifacts/classDiagram/DomainClassDiagram/story4.png" alt="Domain class diagram for Story 4: Add a vehicle to inventory" loading="lazy"></a>
+        </figure>
+        <figure class="artifact slide">
+          <figcaption>Story 5: Browse vehicle inventory</figcaption>
+          <a class="img-link" href="artifacts/classDiagram/DomainClassDiagram/story5.png"><img src="artifacts/classDiagram/DomainClassDiagram/story5.png" alt="Domain class diagram for Story 5: Browse vehicle inventory" loading="lazy"></a>
+        </figure>
+        <figure class="artifact slide">
+          <figcaption>Story 6: Manage parts inventory</figcaption>
+          <a class="img-link" href="artifacts/classDiagram/DomainClassDiagram/story6.png"><img src="artifacts/classDiagram/DomainClassDiagram/story6.png" alt="Domain class diagram for Story 6: Manage parts inventory" loading="lazy"></a>
+        </figure>
+        <figure class="artifact slide">
+          <figcaption>Story 7: Banks and bank accounts</figcaption>
+          <a class="img-link" href="artifacts/classDiagram/DomainClassDiagram/story7.png"><img src="artifacts/classDiagram/DomainClassDiagram/story7.png" alt="Domain class diagram for Story 7: Banks and bank accounts" loading="lazy"></a>
+        </figure>
+        <figure class="artifact slide">
+          <figcaption>Story 8: Internal transaction ledger</figcaption>
+          <a class="img-link" href="artifacts/classDiagram/DomainClassDiagram/story8.png"><img src="artifacts/classDiagram/DomainClassDiagram/story8.png" alt="Domain class diagram for Story 8: Internal transaction ledger" loading="lazy"></a>
+        </figure>
+        <figure class="artifact slide">
+          <figcaption>Story 9: Simulated statement lines</figcaption>
+          <a class="img-link" href="artifacts/classDiagram/DomainClassDiagram/story9.png"><img src="artifacts/classDiagram/DomainClassDiagram/story9.png" alt="Domain class diagram for Story 9: Simulated statement lines" loading="lazy"></a>
+        </figure>
+        <figure class="artifact slide">
+          <figcaption>Story 10: Transfer between accounts</figcaption>
+          <a class="img-link" href="artifacts/classDiagram/DomainClassDiagram/story10.png"><img src="artifacts/classDiagram/DomainClassDiagram/story10.png" alt="Domain class diagram for Story 10: Transfer between accounts" loading="lazy"></a>
+        </figure>
+        <figure class="artifact slide">
+          <figcaption>Story 11: Create a draft sales invoice</figcaption>
+          <a class="img-link" href="artifacts/classDiagram/DomainClassDiagram/story11.png"><img src="artifacts/classDiagram/DomainClassDiagram/story11.png" alt="Domain class diagram for Story 11: Create a draft sales invoice" loading="lazy"></a>
+        </figure>
+        <figure class="artifact slide">
+          <figcaption>Story 12: Post a sales invoice</figcaption>
+          <a class="img-link" href="artifacts/classDiagram/DomainClassDiagram/story12.png"><img src="artifacts/classDiagram/DomainClassDiagram/story12.png" alt="Domain class diagram for Story 12: Post a sales invoice" loading="lazy"></a>
+        </figure>
+        <figure class="artifact slide">
+          <figcaption>Story 13: Cancel and browse sales invoices</figcaption>
+          <a class="img-link" href="artifacts/classDiagram/DomainClassDiagram/story13.png"><img src="artifacts/classDiagram/DomainClassDiagram/story13.png" alt="Domain class diagram for Story 13: Cancel and browse sales invoices" loading="lazy"></a>
+        </figure>
+        <figure class="artifact slide">
+          <figcaption>Story 13.1: View a customer's sales invoices</figcaption>
+          <a class="img-link" href="artifacts/classDiagram/DomainClassDiagram/story13.1.png"><img src="artifacts/classDiagram/DomainClassDiagram/story13.1.png" alt="Domain class diagram for Story 13.1: View a customer's sales invoices" loading="lazy"></a>
+        </figure>
+        <figure class="artifact slide">
+          <figcaption>Story 15: Record a later customer payment</figcaption>
+          <a class="img-link" href="artifacts/classDiagram/DomainClassDiagram/story15.png"><img src="artifacts/classDiagram/DomainClassDiagram/story15.png" alt="Domain class diagram for Story 15: Record a later customer payment" loading="lazy"></a>
+        </figure>
+        <figure class="artifact slide">
+          <figcaption>Story 16: Record a receipt not linked to AR</figcaption>
+          <a class="img-link" href="artifacts/classDiagram/DomainClassDiagram/story16.png"><img src="artifacts/classDiagram/DomainClassDiagram/story16.png" alt="Domain class diagram for Story 16: Record a receipt not linked to AR" loading="lazy"></a>
+        </figure>
+        <figure class="artifact slide">
+          <figcaption>Story 17: AR list and aging</figcaption>
+          <a class="img-link" href="artifacts/classDiagram/DomainClassDiagram/story17.png"><img src="artifacts/classDiagram/DomainClassDiagram/story17.png" alt="Domain class diagram for Story 17: AR list and aging" loading="lazy"></a>
+        </figure>
+        <figure class="artifact slide">
+          <figcaption>Story 18: Customer balances</figcaption>
+          <a class="img-link" href="artifacts/classDiagram/DomainClassDiagram/story18.png"><img src="artifacts/classDiagram/DomainClassDiagram/story18.png" alt="Domain class diagram for Story 18: Customer balances" loading="lazy"></a>
+        </figure>
+        <div class="slide-controls">
+          <button class="slide-button prev" type="button" aria-label="Show previous diagram">Previous</button>
+          <span class="slide-indicator" aria-live="polite">Diagram 1 of 18</span>
+          <button class="slide-button next" type="button" aria-label="Show next diagram">Next</button>
+        </div>
+      </div>
+    </div>
+    <div class="group">
+      <h3>Detailed class diagrams</h3>
+      <div class="slideshow" id="classDetail" data-label="Diagram" aria-label="Detailed class diagrams by user story">
+        <figure class="artifact slide active">
+          <figcaption>Story 1: Manage customers</figcaption>
+          <a class="img-link" href="artifacts/classDiagram/DetailClassDiagram/story1.png"><img src="artifacts/classDiagram/DetailClassDiagram/story1.png" alt="Detailed class diagram for Story 1: Manage customers" loading="lazy"></a>
+        </figure>
+        <figure class="artifact slide">
+          <figcaption>Story 2: Manage employees</figcaption>
+          <a class="img-link" href="artifacts/classDiagram/DetailClassDiagram/story2.png"><img src="artifacts/classDiagram/DetailClassDiagram/story2.png" alt="Detailed class diagram for Story 2: Manage employees" loading="lazy"></a>
+        </figure>
+        <figure class="artifact slide">
+          <figcaption>Story 3: Manage vendors</figcaption>
+          <a class="img-link" href="artifacts/classDiagram/DetailClassDiagram/story3.png"><img src="artifacts/classDiagram/DetailClassDiagram/story3.png" alt="Detailed class diagram for Story 3: Manage vendors" loading="lazy"></a>
+        </figure>
+        <figure class="artifact slide">
+          <figcaption>Story 4: Add a vehicle to inventory</figcaption>
+          <a class="img-link" href="artifacts/classDiagram/DetailClassDiagram/story4.png"><img src="artifacts/classDiagram/DetailClassDiagram/story4.png" alt="Detailed class diagram for Story 4: Add a vehicle to inventory" loading="lazy"></a>
+        </figure>
+        <figure class="artifact slide">
+          <figcaption>Story 5: Browse vehicle inventory</figcaption>
+          <a class="img-link" href="artifacts/classDiagram/DetailClassDiagram/story5%20with%20calculateProfit%20method.png"><img src="artifacts/classDiagram/DetailClassDiagram/story5%20with%20calculateProfit%20method.png" alt="Detailed class diagram for Story 5: Browse vehicle inventory" loading="lazy"></a>
+        </figure>
+        <figure class="artifact slide">
+          <figcaption>Story 6: Manage parts inventory</figcaption>
+          <a class="img-link" href="artifacts/classDiagram/DetailClassDiagram/Story6%20with%20private%20service%20methods.png"><img src="artifacts/classDiagram/DetailClassDiagram/Story6%20with%20private%20service%20methods.png" alt="Detailed class diagram for Story 6: Manage parts inventory" loading="lazy"></a>
+        </figure>
+        <figure class="artifact slide">
+          <figcaption>Story 8: Internal transaction ledger</figcaption>
+          <a class="img-link" href="artifacts/classDiagram/DetailClassDiagram/story8.png"><img src="artifacts/classDiagram/DetailClassDiagram/story8.png" alt="Detailed class diagram for Story 8: Internal transaction ledger" loading="lazy"></a>
+        </figure>
+        <figure class="artifact slide">
+          <figcaption>Story 9: Simulated statement lines</figcaption>
+          <a class="img-link" href="artifacts/classDiagram/DetailClassDiagram/story9.png"><img src="artifacts/classDiagram/DetailClassDiagram/story9.png" alt="Detailed class diagram for Story 9: Simulated statement lines" loading="lazy"></a>
+        </figure>
+        <figure class="artifact slide">
+          <figcaption>Story 10: Transfer between accounts</figcaption>
+          <a class="img-link" href="artifacts/classDiagram/DetailClassDiagram/story10.png"><img src="artifacts/classDiagram/DetailClassDiagram/story10.png" alt="Detailed class diagram for Story 10: Transfer between accounts" loading="lazy"></a>
+        </figure>
+        <figure class="artifact slide">
+          <figcaption>Story 11: Create a draft sales invoice</figcaption>
+          <a class="img-link" href="artifacts/classDiagram/DetailClassDiagram/story11.png"><img src="artifacts/classDiagram/DetailClassDiagram/story11.png" alt="Detailed class diagram for Story 11: Create a draft sales invoice" loading="lazy"></a>
+        </figure>
+        <figure class="artifact slide">
+          <figcaption>Story 12: Post a sales invoice</figcaption>
+          <a class="img-link" href="artifacts/classDiagram/DetailClassDiagram/story12.png"><img src="artifacts/classDiagram/DetailClassDiagram/story12.png" alt="Detailed class diagram for Story 12: Post a sales invoice" loading="lazy"></a>
+        </figure>
+        <figure class="artifact slide">
+          <figcaption>Story 13: Cancel and browse sales invoices</figcaption>
+          <a class="img-link" href="artifacts/classDiagram/DetailClassDiagram/story13.png"><img src="artifacts/classDiagram/DetailClassDiagram/story13.png" alt="Detailed class diagram for Story 13: Cancel and browse sales invoices" loading="lazy"></a>
+        </figure>
+        <figure class="artifact slide">
+          <figcaption>Story 13.1: View a customer's sales invoices</figcaption>
+          <a class="img-link" href="artifacts/classDiagram/DetailClassDiagram/story13.1.png"><img src="artifacts/classDiagram/DetailClassDiagram/story13.1.png" alt="Detailed class diagram for Story 13.1: View a customer's sales invoices" loading="lazy"></a>
+        </figure>
+        <figure class="artifact slide">
+          <figcaption>Story 14: Payment condition, receipt, and AR</figcaption>
+          <a class="img-link" href="artifacts/classDiagram/DetailClassDiagram/story14.png"><img src="artifacts/classDiagram/DetailClassDiagram/story14.png" alt="Detailed class diagram for Story 14: Payment condition, receipt, and AR" loading="lazy"></a>
+        </figure>
+        <figure class="artifact slide">
+          <figcaption>Story 15: Record a later customer payment</figcaption>
+          <a class="img-link" href="artifacts/classDiagram/DetailClassDiagram/story15.png"><img src="artifacts/classDiagram/DetailClassDiagram/story15.png" alt="Detailed class diagram for Story 15: Record a later customer payment" loading="lazy"></a>
+        </figure>
+        <figure class="artifact slide">
+          <figcaption>Story 16: Record a receipt not linked to AR</figcaption>
+          <a class="img-link" href="artifacts/classDiagram/DetailClassDiagram/story16.png"><img src="artifacts/classDiagram/DetailClassDiagram/story16.png" alt="Detailed class diagram for Story 16: Record a receipt not linked to AR" loading="lazy"></a>
+        </figure>
+        <figure class="artifact slide">
+          <figcaption>Story 17: AR list and aging</figcaption>
+          <a class="img-link" href="artifacts/classDiagram/DetailClassDiagram/story17.png"><img src="artifacts/classDiagram/DetailClassDiagram/story17.png" alt="Detailed class diagram for Story 17: AR list and aging" loading="lazy"></a>
+        </figure>
+        <figure class="artifact slide">
+          <figcaption>Story 18: Customer balances</figcaption>
+          <a class="img-link" href="artifacts/classDiagram/DetailClassDiagram/story18.png"><img src="artifacts/classDiagram/DetailClassDiagram/story18.png" alt="Detailed class diagram for Story 18: Customer balances" loading="lazy"></a>
+        </figure>
+        <div class="slide-controls">
+          <button class="slide-button prev" type="button" aria-label="Show previous diagram">Previous</button>
+          <span class="slide-indicator" aria-live="polite">Diagram 1 of 18</span>
+          <button class="slide-button next" type="button" aria-label="Show next diagram">Next</button>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- 5. CLASS -->
-  <section id="class">
-    <h2>5. Class Diagrams</h2>
-    <div class="slideshow" aria-label="Class diagrams by project phase">
+  <!-- 5. SEQUENCE -->
+  <section id="sequence">
+    <h2>5. Sequence Diagrams</h2>
+    <div class="slideshow" id="sequenceSlides" data-label="Diagram" aria-label="Sequence diagrams by user story">
       <figure class="artifact slide active">
-        <figcaption>Class Diagram: Phase 1</figcaption>
-        <a class="img-link" href="artifacts/autoplex_class_1_sales_purchasing_phase1.png"><img src="artifacts/autoplex_class_1_sales_purchasing_phase1.png" alt="Class diagram for Phase 1"></a>
+        <figcaption>Story 8: Internal transaction ledger</figcaption>
+        <a class="img-link" href="artifacts/sequenceDiagram/story8.png"><img src="artifacts/sequenceDiagram/story8.png" alt="Sequence diagram for Story 8: Internal transaction ledger" loading="lazy"></a>
       </figure>
       <figure class="artifact slide">
-        <figcaption>Class Diagram: Phase 2</figcaption>
-        <a class="img-link" href="artifacts/autoplex_class_1_sales_purchasing_phase2.png"><img src="artifacts/autoplex_class_1_sales_purchasing_phase2.png" alt="Class diagram for Phase 2"></a>
+        <figcaption>Story 9: Simulated statement lines</figcaption>
+        <a class="img-link" href="artifacts/sequenceDiagram/story9.png"><img src="artifacts/sequenceDiagram/story9.png" alt="Sequence diagram for Story 9: Simulated statement lines" loading="lazy"></a>
       </figure>
       <figure class="artifact slide">
-        <figcaption>Class Diagram: Phase 3</figcaption>
-        <a class="img-link" href="artifacts/autoplex_class_1_sales_purchasing_phase3.png"><img src="artifacts/autoplex_class_1_sales_purchasing_phase3.png" alt="Class diagram for Phase 3"></a>
+        <figcaption>Story 10: Transfer between accounts</figcaption>
+        <a class="img-link" href="artifacts/sequenceDiagram/story10.png"><img src="artifacts/sequenceDiagram/story10.png" alt="Sequence diagram for Story 10: Transfer between accounts" loading="lazy"></a>
       </figure>
       <figure class="artifact slide">
-        <figcaption>Class Diagram: Phase 4</figcaption>
-        <a class="img-link" href="artifacts/autoplex_class_1_sales_purchasing_phase4.png"><img src="artifacts/autoplex_class_1_sales_purchasing_phase4.png" alt="Class diagram for Phase 4"></a>
+        <figcaption>Story 14: Payment condition, receipt, and AR</figcaption>
+        <a class="img-link" href="artifacts/sequenceDiagram/story14.png"><img src="artifacts/sequenceDiagram/story14.png" alt="Sequence diagram for Story 14: Payment condition, receipt, and AR" loading="lazy"></a>
       </figure>
       <figure class="artifact slide">
-        <figcaption>Class Diagram: Phase 5</figcaption>
-        <a class="img-link" href="artifacts/autoplex_class_1_sales_purchasing_phase5.png"><img src="artifacts/autoplex_class_1_sales_purchasing_phase5.png" alt="Class diagram for Phase 5"></a>
+        <figcaption>Story 15: Record a later customer payment</figcaption>
+        <a class="img-link" href="artifacts/sequenceDiagram/story15.png"><img src="artifacts/sequenceDiagram/story15.png" alt="Sequence diagram for Story 15: Record a later customer payment" loading="lazy"></a>
       </figure>
       <figure class="artifact slide">
-        <figcaption>Class Diagram: Phase 6</figcaption>
-        <a class="img-link" href="artifacts/autoplex_class_2_banking_phase6.png"><img src="artifacts/autoplex_class_2_banking_phase6.png" alt="Class diagram for Phase 6"></a>
+        <figcaption>Story 16: Record a receipt not linked to AR</figcaption>
+        <a class="img-link" href="artifacts/sequenceDiagram/story16.png"><img src="artifacts/sequenceDiagram/story16.png" alt="Sequence diagram for Story 16: Record a receipt not linked to AR" loading="lazy"></a>
       </figure>
       <figure class="artifact slide">
-        <figcaption>Class Diagram: Phase 7</figcaption>
-        <a class="img-link" href="artifacts/autoplex_class_2_banking_phase7.png"><img src="artifacts/autoplex_class_2_banking_phase7.png" alt="Class diagram for Phase 7"></a>
+        <figcaption>Story 17: AR list and aging</figcaption>
+        <a class="img-link" href="artifacts/sequenceDiagram/story17.png"><img src="artifacts/sequenceDiagram/story17.png" alt="Sequence diagram for Story 17: AR list and aging" loading="lazy"></a>
       </figure>
       <figure class="artifact slide">
-        <figcaption>Class Diagram: Phase 8</figcaption>
-        <a class="img-link" href="artifacts/autoplex_class_2_banking_phase8.png"><img src="artifacts/autoplex_class_2_banking_phase8.png" alt="Class diagram for Phase 8"></a>
-      </figure>
-      <figure class="artifact slide">
-        <figcaption>Class Diagram: Phase 9</figcaption>
-        <a class="img-link" href="artifacts/autoplex_class_3_reporting_phase9.png"><img src="artifacts/autoplex_class_3_reporting_phase9.png" alt="Class diagram for Phase 9"></a>
+        <figcaption>Story 18: Customer balances</figcaption>
+        <a class="img-link" href="artifacts/sequenceDiagram/story18.png"><img src="artifacts/sequenceDiagram/story18.png" alt="Sequence diagram for Story 18: Customer balances" loading="lazy"></a>
       </figure>
       <div class="slide-controls">
-        <button class="slide-button" type="button" id="classPrevious" aria-label="Show previous class diagram">Previous</button>
-        <span class="slide-indicator" id="classIndicator" aria-live="polite">Diagram 1 of 9</span>
-        <button class="slide-button" type="button" id="classNext" aria-label="Show next class diagram">Next</button>
+        <button class="slide-button prev" type="button" aria-label="Show previous diagram">Previous</button>
+        <span class="slide-indicator" aria-live="polite">Diagram 1 of 8</span>
+        <button class="slide-button next" type="button" aria-label="Show next diagram">Next</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. STATE MACHINE -->
+  <section id="statemachine">
+    <h2>6. State Machine Diagrams</h2>
+    <div class="slideshow" id="stateSlides" data-label="Diagram" aria-label="State machine diagrams">
+      <figure class="artifact slide active">
+        <figcaption>Vehicle
+          <span>Lifecycle states of a vehicle in inventory.</span>
+        </figcaption>
+        <a class="img-link" href="artifacts/stateMachineDiagram/Vehicle.png"><img src="artifacts/stateMachineDiagram/Vehicle.png" alt="State machine diagram: Vehicle" loading="lazy"></a>
+      </figure>
+      <figure class="artifact slide">
+        <figcaption>Story 14: Payment condition, receipt, and AR</figcaption>
+        <a class="img-link" href="artifacts/stateMachineDiagram/AutoPlex_Story14_State_Machine_Diagram.png"><img src="artifacts/stateMachineDiagram/AutoPlex_Story14_State_Machine_Diagram.png" alt="State machine diagram for Story 14: Payment condition, receipt, and AR" loading="lazy"></a>
+      </figure>
+      <figure class="artifact slide">
+        <figcaption>Stories 14–15: Receipt and later customer payments</figcaption>
+        <a class="img-link" href="artifacts/stateMachineDiagram/AutoPlex_Story14_15_State_Machine_Diagram.png"><img src="artifacts/stateMachineDiagram/AutoPlex_Story14_15_State_Machine_Diagram.png" alt="State machine diagram for Stories 14 and 15: receipt and later customer payments" loading="lazy"></a>
+      </figure>
+      <div class="slide-controls">
+        <button class="slide-button prev" type="button" aria-label="Show previous diagram">Previous</button>
+        <span class="slide-indicator" aria-live="polite">Diagram 1 of 3</span>
+        <button class="slide-button next" type="button" aria-label="Show next diagram">Next</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. OBJECT -->
+  <section id="object">
+    <h2>7. Object Diagrams</h2>
+    <div class="slideshow" id="objectSlides" data-label="Diagram" aria-label="Object diagrams">
+      <figure class="artifact slide active">
+        <figcaption>Story 14: Payment condition, receipt, and AR</figcaption>
+        <a class="img-link" href="artifacts/objectDiagram/AutoPlex_Story14_Object_Diagram.png"><img src="artifacts/objectDiagram/AutoPlex_Story14_Object_Diagram.png" alt="Object diagram for Story 14: Payment condition, receipt, and AR" loading="lazy"></a>
+      </figure>
+      <figure class="artifact slide">
+        <figcaption>Stories 14–15: Multiple payments</figcaption>
+        <a class="img-link" href="artifacts/objectDiagram/AutoPlex_Story14_15_Multiple_Payments_Object_Diagram.png"><img src="artifacts/objectDiagram/AutoPlex_Story14_15_Multiple_Payments_Object_Diagram.png" alt="Object diagram for Stories 14 and 15: multiple payments" loading="lazy"></a>
+      </figure>
+      <div class="slide-controls">
+        <button class="slide-button prev" type="button" aria-label="Show previous diagram">Previous</button>
+        <span class="slide-indicator" aria-live="polite">Diagram 1 of 2</span>
+        <button class="slide-button next" type="button" aria-label="Show next diagram">Next</button>
       </div>
     </div>
   </section>
@@ -341,7 +550,7 @@
       <p>Documents from the <code>docs</code> folder of this repository.</p>
       <ul class="links">
         <li><a href="https://github.com/blessedneelesh/AutoPlexMotors.github.io/blob/main/docs/software_requirements_specification.md">Software Requirements Specification</a></li>
-        <li><a href="https://github.com/blessedneelesh/AutoPlexMotors.github.io/blob/main/docs/incremental_user_stories.md">Incremental User Stories</a></li>
+        <li><a href="https://github.com/blessedneelesh/AutoPlexMotors.github.io/blob/main/docs/incremental_user_stories.md">Incremental User Stories</a> <span class="note">(the page summary above follows version 3)</span></li>
         <li><a href="https://github.com/blessedneelesh/AutoPlexMotors.github.io/blob/main/docs/traceability_matrix.md">Traceability Matrix</a></li>
         <li><a href="https://github.com/blessedneelesh/AutoPlexMotors.github.io/tree/main/docs">Docs folder README</a></li>
       </ul>
@@ -356,28 +565,20 @@
 
 <script>
   (() => {
-    const initializeSlideshow = (sectionId, previousId, nextId, indicatorId, label) => {
-      const slides = Array.from(document.querySelectorAll(`#${sectionId} .slide`));
-      const previousButton = document.getElementById(previousId);
-      const nextButton = document.getElementById(nextId);
-      const indicator = document.getElementById(indicatorId);
-      let currentSlide = 0;
-
-      const showSlide = (slideIndex) => {
-        currentSlide = (slideIndex + slides.length) % slides.length;
-        slides.forEach((slide, index) => {
-          slide.classList.toggle('active', index === currentSlide);
-        });
-        indicator.textContent = `${label} ${currentSlide + 1} of ${slides.length}`;
+    document.querySelectorAll('.slideshow').forEach((show) => {
+      const slides = Array.from(show.querySelectorAll('.slide'));
+      const indicator = show.querySelector('.slide-indicator');
+      const label = show.dataset.label || 'Slide';
+      let current = 0;
+      const showSlide = (i) => {
+        current = (i + slides.length) % slides.length;
+        slides.forEach((s, idx) => s.classList.toggle('active', idx === current));
+        indicator.textContent = `${label} ${current + 1} of ${slides.length}`;
       };
-
-      previousButton.addEventListener('click', () => showSlide(currentSlide - 1));
-      nextButton.addEventListener('click', () => showSlide(currentSlide + 1));
+      show.querySelector('.prev').addEventListener('click', () => showSlide(current - 1));
+      show.querySelector('.next').addEventListener('click', () => showSlide(current + 1));
       showSlide(0);
-    };
-
-    initializeSlideshow('crc', 'crcPrevious', 'crcNext', 'crcIndicator', 'Phase');
-    initializeSlideshow('class', 'classPrevious', 'classNext', 'classIndicator', 'Diagram');
+    });
   })();
 </script>
 
