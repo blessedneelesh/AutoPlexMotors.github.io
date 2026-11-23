@@ -1,26 +1,36 @@
 # AutoPlex Motors: Incremental User Stories
 
-Each story below is small enough to build, test, and merge into the main branch independently. Stories depend only on earlier stories. Each **Not yet** note identifies what is intentionally excluded and which later story adds it, so no story refers to a table that has not yet been introduced.
+Each story below is small enough to build, test, and merge to main on its own. A story depends only on earlier stories. Every **Not yet** line says what is deliberately left out and which later story adds it, so no story refers to a table that does not exist yet.
+
+Banking is built before receivables and payables. Every customer payment is saved directly as a Bank Receipt, and every vendor payment directly as a Bank Payment. No temporary payment tables are needed and nothing has to be migrated later.
 
 ## Delivery sequence
 
 - Phase 1, Master data: 1 Manage customers, 2 Manage employees, 3 Manage vendors
 - Phase 2, Inventory: 4 Add a vehicle to inventory, 5 Browse vehicle inventory, 6 Manage parts inventory
-- Phase 3, Sales Invoices: 7 Create a draft sales invoice, 8 Post a sales invoice, 9 Cancel and browse sales invoices
-- Phase 4, Accounts Receivable: 10 Payment conditions and AR, 11 Record a later customer payment, 12 AR list and aging, 13 Customer balances
-- Phase 5, Accounts Payable: 14 Vehicle purchase payment conditions and AP, 15 Record a later vendor payment, 16 AP list and aging
-- Phase 6, Banking: 17 Banks and bank accounts, 18 Bank receipts, 19 Bank payments, 20 Internal transaction ledger, 21 Reverse a banking transaction, 22 Transfer between accounts
-- Phase 7, Simulated Bank Statements: 23 Generate statement lines, 24 Statement-only adjustment, 25 Add and post an adjustment
-- Phase 8, Reconciliation: 26 Reconciliation data and balances, 27 Suggest matches, 28 Confirm a match, 29 Post an unmatched adjustment, 30 Reset or reopen reconciliation
-- Phase 9, Reporting: 31 Revenue, 32 COGS, 33 Operating expenses, 34 Profit and Loss report, 35 Compare periods, 36 Drill down and export
+- Phase 3, Banking foundation: 7 Banks and bank accounts, 8 Internal transaction ledger, 9 Simulated statement lines, 10 Transfer between accounts
+- Phase 4, Sales invoice: 11 Create a draft sales invoice, 12 Post a sales invoice, 13 Cancel and browse sales invoices
+- Phase 5, Accounts Receivable: 14 Payment condition, receipt, and AR, 15 Record a later customer payment, 16 Record a receipt not linked to AR, 17 AR list and aging, 18 Customer balances
+- Phase 6, Accounts Payable: 19 Vehicle purchase payment condition and AP, 20 Record a later vendor payment, 21 Record a payment not linked to AP, 22 AP list and aging
+- Phase 7, Corrections: 23 Reverse a banking transaction
+- Phase 8, Statement adjustments: 24 Statement-only adjustment, 25 Add and post an adjustment
+- Phase 9, Reporting: 26 Revenue, 27 COGS, 28 Operating expenses, 29 Profit & Loss report, 30 Compare periods, 31 Drill-down and export
 
 ## Rules that apply to every story
 
-- Posting is atomic: either all related records are saved, or none are.
+- Posting is atomic: all related records save, or none do.
 - Posted records are reversed or cancelled, never deleted.
-- Monetary values use decimal arithmetic.
-- Records retain their creation date, user, reference, and status.
-- Validation errors are displayed before posting.
+- Money uses decimal arithmetic.
+- Records keep their creation date, user, reference, and status.
+- Validation errors are shown before posting.
+- Every receipt and payment has a bank account. Cash uses a Cash on hand account.
+- Every posted receipt, payment, transfer, and adjustment creates exactly one Transaction and one statement line.
+
+## Data model notes
+
+- Bank Receipt links to the Sales Invoice (`salesInvoiceId`) and, when one exists, the AR Invoice (`arInvoiceId`). A fully paid sale has no AR Invoice, so the Sales Invoice link is what ties its receipt to the sale.
+- Bank Payment links to the Vehicle (`vehicleId`) and, when one exists, the AP Bill (`apBillId`), for the same reason.
+- No Customer Payment or Vendor Payment table is used.
 
 ## Phase 1: Master data
 
@@ -39,15 +49,15 @@ As a salesperson,
 
 - Sales invoices can select an existing customer
 
-**Not yet:** Balance and totalPurchases exist but remain 0 until Story 13.
+**Not yet:** balance and totalPurchases exist but stay 0 until Story 18.
 
 **Acceptance criteria**
 
-- First name and last name are required.
-- Email must be a valid format when provided.
-- New customers are Active.
-- Inactive customers cannot be selected on new invoices.
-- Balance and totalPurchases are read-only and default to 0.
+1. First name and last name are required.
+2. Email must be a valid format when provided.
+3. New customers are Active.
+4. Inactive customers cannot be selected on new invoices.
+5. Balance and totalPurchases are read-only and default to 0.
 
 ### Story 2: Manage employees
 
@@ -64,14 +74,14 @@ As an administrator,
 
 - Invoices can record the responsible salesperson
 
-**Not yet:** payroll and commission expense in reports (Story 33).
+**Not yet:** payroll and commission expense in reports (Story 28).
 
 **Acceptance criteria**
 
-- First name and last name are required.
-- Salary and bonus cannot be negative.
-- Commission rate must be between 0 and 100 percent.
-- Inactive employees cannot be assigned to new invoices.
+1. First name and last name are required.
+2. Salary and bonus cannot be negative.
+3. Commission rate must be between 0 and 100 percent.
+4. Inactive employees cannot be assigned to new invoices.
 
 ### Story 3: Manage vendors
 
@@ -88,14 +98,14 @@ As a purchasing officer,
 
 - Vehicle and parts purchases can reference the supplier
 
-**Not yet:** Vendor balance and totalPurchases remain 0 until Stories 14–16.
+**Not yet:** vendor balance and totalPurchases stay 0 until Stories 19 to 22.
 
 **Acceptance criteria**
 
-- Vendor name is required.
-- Type is one of Vehicle, Parts, or Service.
-- Inactive vendors cannot be selected on new purchases.
-- Balance and totalPurchases are read-only and default to 0.
+1. Vendor name is required.
+2. Type is one of Vehicle, Parts, or Service.
+3. Inactive vendors cannot be selected on new purchases.
+4. Balance and totalPurchases are read-only and default to 0.
 
 ## Phase 2: Inventory
 
@@ -121,16 +131,16 @@ Total Vehicle Cost =
 Purchase Price + Additional Costs
 ```
 
-**Not yet:** Payment conditions, the AP Bill, and payments (Stories 14 and 19).
+**Not yet:** payment condition, AP Bill, and any payment (Story 19).
 
 **Acceptance criteria**
 
-- Vendor is required.
-- VIN is required and unique.
-- Purchase price must be greater than zero.
-- Additional costs and intended selling price cannot be negative.
-- Total cost equals purchase price plus additional costs.
-- The vehicle is saved with Available status.
+1. Vendor is required.
+2. VIN is required and unique.
+3. Purchase price must be greater than zero.
+4. Additional costs and intended selling price cannot be negative.
+5. Total cost equals purchase price plus additional costs.
+6. The vehicle is saved with Available status.
 
 ### Story 5: Browse vehicle inventory
 
@@ -153,14 +163,14 @@ Gross Profit = Selling Price − Total Vehicle Cost
 Gross Margin % = Gross Profit ÷ Selling Price × 100
 ```
 
-**Not yet:** Sold status, which is assigned in Story 8.
+**Not yet:** Sold status, which Story 12 sets.
 
 **Acceptance criteria**
 
-- The list shows one current status per vehicle.
-- Profit and margin use total cost, not only purchase price.
-- Search and status filters work together.
-- Margin shows as unavailable when the selling price is zero.
+1. The list shows one current status per vehicle.
+2. Profit and margin use total cost, not only purchase price.
+3. Search and status filters work together.
+4. Margin shows as unavailable when the selling price is zero.
 
 ### Story 6: Manage parts inventory
 
@@ -177,19 +187,129 @@ As a parts inventory manager,
 
 - Parts are reordered before stock runs out
 
-**Not yet:** Quantity changes from sales or usage, and parts COGS (Story 32). Quantity is edited manually for now.
+**Not yet:** quantity changes from sales or usage, and parts COGS (Story 27). Quantity is edited manually for now.
 
 **Acceptance criteria**
 
-- Part number is required and unique.
-- Vendor is required.
-- Prices and quantity cannot be negative.
-- A part is low stock when quantity is at or below its reorder level.
-- Inventory value equals quantity × cost price.
+1. Part number is required and unique.
+2. Vendor is required.
+3. Prices and quantity cannot be negative.
+4. A part is low stock when quantity is at or below its reorder level.
+5. Inventory value equals quantity × cost price.
 
-## Phase 3: Sales invoice
+## Phase 3: Banking foundation
 
-### Story 7: Create a draft sales invoice
+### Story 7: Banks and bank accounts
+
+**Depends on:** nothing (can be built in parallel with Phases 1 and 2)
+
+As an accountant,
+
+**I want to:**
+
+- Create and maintain banks
+- Add accounts under each bank (name, account number, routing number, type, opening balance, status)
+- See each account's current book balance
+
+**so that:**
+
+- AutoPlex can track cash held at different institutions
+
+**Not yet:** transactions and statement lines (Stories 8 and 9), receipts (Story 14), and payments (Story 19).
+
+**Acceptance criteria**
+
+1. A Bank Account must belong to a Bank.
+2. Account name and account type are required.
+3. Opening balance cannot be negative.
+4. Book balance starts equal to the opening balance.
+5. Account numbers are masked in lists.
+6. Inactive accounts are saved but cannot be used in later stories.
+7. Type includes Cash on hand, so cash receipts and payments also have an account.
+
+### Story 8: Internal transaction ledger
+
+**Depends on:** Story 7
+
+As an accountant,
+
+**I want to:**
+
+- Record every bank movement as an internal Transaction through one posting service
+- Have each posted Transaction update its account's book balance
+- List and filter Transactions
+
+**so that:**
+
+- Every bank movement can be audited
+- Book balances can be calculated from transactions
+- Transfers, receipts, payments, adjustments, and reversals all post the same way
+
+**Not yet:** the screens that create Transactions: transfers (Story 10), receipts (Stories 14 to 16), payments (Stories 19 to 21), adjustments (Story 25), and reversals (Story 23). This story is tested through the posting service until Story 10 adds the first screen.
+
+**Acceptance criteria**
+
+1. Direction is in or out, and amount is greater than zero.
+2. Each Transaction references one active bank account and records its source type and source number.
+3. A posted incoming Transaction increases the book balance. A posted outgoing Transaction decreases it.
+4. An outgoing Transaction cannot exceed the account's book balance.
+5. Draft Transactions do not affect balances.
+6. Posted Transactions cannot be edited or deleted.
+7. The list filters by account, direction, and date.
+
+### Story 9: Simulated statement lines
+
+**Depends on:** Story 8
+
+As an accountant,
+
+**I want to:** have a simulated bank statement line created automatically for each posted Transaction
+
+**so that:**
+
+- The statement can later be compared with the internal ledger
+
+```text
+New Running Balance =
+Previous Running Balance + Deposit − Withdrawal
+```
+
+**Not yet:** statement-only adjustments (Story 24).
+
+**Acceptance criteria**
+
+1. Each posted Transaction creates exactly one line in the same save, with source Simulated and status Cleared.
+2. Incoming Transactions set a deposit and outgoing set a withdrawal. Never both.
+3. Lines created from Transactions start as Matched and store the Transaction ID.
+4. Running balance is calculated in statement-date order.
+5. No backfill is needed, because no receipts or payments exist before this story.
+6. The list filters by account, month, and type.
+
+### Story 10: Transfer between bank accounts
+
+**Depends on:** Story 9
+
+As an accountant,
+
+**I want to:** move money between two AutoPlex bank accounts
+
+**so that:**
+
+- Cash can move between operating, payroll, and savings accounts
+- Total cash does not change
+
+**Acceptance criteria**
+
+1. Source and destination must be different, active accounts.
+2. Amount must be greater than zero and not exceed the source balance.
+3. One outgoing and one incoming Transaction share a transfer reference.
+4. Both balances update together.
+5. A transfer does not affect revenue or operating expenses.
+6. Each side gets its own statement line.
+
+## Phase 4: Sales invoice
+
+### Story 11: Create a draft sales invoice
 
 **Depends on:** Stories 1, 2, 4
 
@@ -212,20 +332,20 @@ Invoice Total =
 Sale Price + Tax + Fees − Discount
 ```
 
-**Not yet:** Posting, vehicle status changes, payments, AR, receipts, banking, and statements (Stories 8, 10, and 18).
+**Not yet:** posting, vehicle status change, payments, AR, receipts, bank, and statement (Stories 12 and 14).
 
 **Acceptance criteria**
 
-- Only vehicles with Available status can be selected.
-- Customer, salesperson, vehicle, invoice date, and sale price are required.
-- The discount cannot exceed the sale price.
-- The invoice total must be greater than zero.
-- A Draft invoice has paid = 0, balance = total, and does not change the vehicle.
-- Each invoice gets a unique number.
+1. Only vehicles with Available status can be selected.
+2. Customer, salesperson, vehicle, invoice date, and sale price are required.
+3. The discount cannot exceed the sale price.
+4. The invoice total must be greater than zero.
+5. A Draft invoice has paid = 0, balance = total, and does not change the vehicle.
+6. Each invoice gets a unique number.
 
-### Story 8: Post a sales invoice
+### Story 12: Post a sales invoice
 
-**Depends on:** Story 7
+**Depends on:** Story 11
 
 As a salesperson,
 
@@ -239,20 +359,20 @@ As a salesperson,
 - The vehicle cannot be sold twice
 - Revenue and COGS can be reported later
 
-**Not yet:** Payment conditions and AR (Story 10). Posted invoices start as Unpaid.
+**Not yet:** payment condition, receipt, and AR (Story 14). Posted invoices start as Unpaid.
 
 **Acceptance criteria**
 
-- Only Draft invoices can be posted.
-- Validation runs again at posting and errors are shown before saving.
-- Posting changes the vehicle status to Sold and stores the invoice ID on the vehicle.
-- A Sold vehicle no longer appears in the available-vehicle selector.
-- If two invoices try to post the same vehicle, only one succeeds.
-- Posted invoices cannot be edited or deleted.
+1. Only Draft invoices can be posted.
+2. Validation runs again at posting and errors are shown before saving.
+3. Posting changes the vehicle status to Sold and stores the invoice ID on the vehicle.
+4. A Sold vehicle no longer appears in the available-vehicle selector.
+5. If two invoices try to post the same vehicle, only one succeeds.
+6. Posted invoices cannot be edited or deleted.
 
-### Story 9: Cancel and browse sales invoices
+### Story 13: Cancel and browse sales invoices
 
-**Depends on:** Story 8
+**Depends on:** Story 12
 
 As a salesperson,
 
@@ -266,83 +386,123 @@ As a salesperson,
 - Mistakes are corrected without losing history
 - The vehicle can return to inventory
 
-**Not yet:** Cancelling invoices that already have payments (Story 21).
+**Not yet:** cancelling invoices that already have payments (Story 23).
 
 **Acceptance criteria**
 
-- Cancelling sets the status to Cancelled and the vehicle back to Available.
-- Only invoices with paid = 0 can be cancelled.
-- A reason is required.
-- The list searches by number, customer, VIN, and status, and filters by date.
-- Cancelled invoices stay visible.
+1. Cancelling sets the status to Cancelled and the vehicle back to Available.
+2. Only invoices with paid = 0 can be cancelled.
+3. A reason is required.
+4. The list searches by number, customer, VIN, and status, and filters by date.
+5. Cancelled invoices stay visible.
 
-## Phase 4: Accounts Receivable
+### Story 13.1: View a customer's sales invoices
 
-### Story 10: Payment condition and AR
+As a salesperson or accountant, I want to list all sales invoices for one customer, so that I can review what they bought, what they owe, and follow up on unpaid invoices.
 
-**Depends on:** Story 8
+**Acceptance criteria**
+
+- `GET /SalesInvoice/GetSalesInvoiceByCustomer?customerId=` returns that customer's invoices as 200.
+- A customer with no invoices returns 200 with empty items, not 404.
+- The response is NOT paged (PageNumber, PageSize, capped by the existing RequestParameters limit) and ordered by invoice date, newest first, then by number.
+- Each item has the same fields as GetSalesInvoiceByCustomer with attributes:
+
+  | Invoice_Number | Invoice_Date | Vehicle | Salesperson | Amount | Paid | Payment_Status |
+  | -------------- | ------------ | ------- | ----------- | ------ | ---- | -------------- |
+
+- An unknown customerId returns an empty list, not an error.
+- It is read-only: nothing is written or changed.
+
+## Phase 5: Accounts Receivable
+
+### Story 14: Payment condition, receipt, and AR
+
+**Depends on:** Stories 9, 12
 
 As a salesperson,
 
 **I want to:**
 
 - Record whether the customer paid in full, paid partially, or bought on credit
-- Enter the amount received, payment method, and reference
+- Enter the amount received, payment method, reference, and the bank account it goes into
 - Have AR created only when a balance remains
 
 **so that:**
 
 - Fully paid invoices create no unnecessary AR records
 - Outstanding balances appear in Accounts Receivable
+- Money received shows in the correct account straight away
 
-The initial amount is saved as a Customer Payment record (invoice, date, amount, method, reference). It has no bank account yet.
+The amount received is saved as a Bank Receipt linked to the Sales Invoice, and to the AR Invoice when one is created. The receipt posts its Transaction and statement line through Stories 8 and 9.
 
-**Not yet:** A bank account, bank receipt, transaction, and statement line (Stories 18, 20, and 23).
+**Not yet:** later payments (Story 15) and customer balances (Story 18).
 
 **Acceptance criteria**
 
-- Paid in full: paid = total, balance = 0, status Paid, no AR record.
-- Partial payment: balance = total − paid, status Partial, AR created.
-- Credit sale: paid = 0, status Unpaid, AR created, no Customer Payment.
-- The AR amount, paid, and balance match the Sales Invoice.
-- Amount received cannot be negative or exceed the total.
-- Method is one of Cash, Card, Transfer, or Check.
+1. Paid in full: paid = total, balance = 0, status Paid, one Bank Receipt, no AR record.
+2. Partial payment: balance = total − paid, status Partial, one Bank Receipt, AR created.
+3. Credit sale: paid = 0, status Unpaid, AR created, no Bank Receipt.
+4. The AR amount, paid, and balance match the Sales Invoice.
+5. Amount received cannot be negative or exceed the total.
+6. Method is one of Cash, Card, Transfer, or Check.
+7. A bank account is required whenever an amount is received. Inactive accounts are rejected.
+8. The invoice, AR, Bank Receipt, Transaction, statement line, and book balance save together.
 
-### Story 11: Record a later customer payment
+### Story 15: Record a later customer payment
 
-**Depends on:** Story 10
+**Depends on:** Story 14
 
 As an accounts receivable clerk,
 
 **I want to:**
 
-- Select an open AR invoice and enter the date, amount, method, and reference
+- Select an open AR invoice and enter the date, amount, method, reference, and bank account
 - See the payment history on the invoice
 
 **so that:**
 
 - AR and invoice balances stay current
-
-**Not yet:** A bank account (Story 18).
+- Customer money is deposited into the correct account
 
 **Acceptance criteria**
 
-- Amount must be greater than zero.
-- Amount cannot exceed the AR balance.
-- Each payment creates a separate Customer Payment record.
-- AR and Sales Invoice paid, balance, and status update together.
-- Full payment sets Paid. Partial payment sets Partial.
-- Previous payments are never overwritten.
+1. Amount must be greater than zero.
+2. Amount cannot exceed the AR balance.
+3. Each payment creates a separate Bank Receipt with its own Transaction and statement line.
+4. AR and Sales Invoice paid, balance, and status update together.
+5. Full payment sets Paid. Partial payment sets Partial.
+6. A bank account is required. Inactive accounts are rejected.
+7. The selected account's book balance increases.
+8. Previous receipts are never overwritten.
 
-### Story 12: AR list and aging
+### Story 16: Record a receipt not linked to AR
 
-**Depends on:** Story 10
+**Depends on:** Story 9
+
+As an accounts receivable clerk,
+
+**I want to:** record money received from another payer that is not linked to an invoice
+
+**so that:**
+
+- All money received is recorded in the correct account
+
+**Acceptance criteria**
+
+1. Payer, date, amount, method, bank account, and description are required.
+2. Amount must be greater than zero.
+3. The receipt does not change any customer, invoice, or AR balance.
+4. The receipt creates one Transaction and one statement line and increases the book balance.
+5. Inactive accounts are rejected.
+6. Each receipt is separate and previous receipts are never overwritten.
+
+### Story 17: AR list and aging
+
+**Depends on:** Story 14
 
 As an accountant,
 
-**I want to:**
-
-- View outstanding AR with the number of days overdue and its status
+**I want to:** view outstanding AR with days overdue and status
 
 **so that:**
 
@@ -350,20 +510,18 @@ As an accountant,
 
 **Acceptance criteria**
 
-- The list shows the customer, invoice, due date, amount, paid amount, balance, days overdue, and status.
-- Days overdue equals the as-of date minus the due date and can never be less than zero.
-- An open AR with a past due date shows Overdue.
-- The list filters by status and customer.
+1. The list shows customer, invoice, due date, amount, paid, balance, days, and status.
+2. Days overdue is the as-of date minus the due date, never below zero.
+3. An open AR with a past due date shows Overdue.
+4. The list filters by status and customer.
 
-### Story 13: Customer balances
+### Story 18: Customer balances
 
-**Depends on:** Stories 10, 11
+**Depends on:** Stories 14, 15
 
 As an accountant,
 
-**I want to:**
-
-- Keep customer balances and total purchases up to date
+**I want to:** keep customer balance and total purchases up to date
 
 **so that:**
 
@@ -371,23 +529,23 @@ As an accountant,
 
 **Acceptance criteria**
 
-- Customer balance equals the sum of that customer's open AR balances.
-- Total purchases equals the sum of posted, non-cancelled invoice totals.
-- Both update on posting, payment, and cancellation.
-- Balance is never negative.
+1. Customer balance equals the sum of that customer's open AR balances.
+2. Total purchases equals the sum of posted, non-cancelled invoice totals.
+3. Both update on posting, payment, and cancellation.
+4. Balance is never negative.
 
-## Phase 5: Accounts Payable
+## Phase 6: Accounts Payable
 
-### Story 14: Vehicle purchase payment conditions and AP
+### Story 19: Vehicle purchase payment condition and AP
 
-**Depends on:** Story 4
+**Depends on:** Stories 4, 9
 
 As a purchasing officer,
 
 **I want to:**
 
 - Record whether the vehicle was paid in full, paid partially, or bought on credit
-- Enter the amount paid now, method, and reference
+- Enter the amount paid now, method, reference, and the bank account it comes from
 - Have an AP Bill created only when a vendor balance remains
 
 **so that:**
@@ -395,7 +553,7 @@ As a purchasing officer,
 - Unpaid vendor balances appear in Accounts Payable
 - Inventory cost is unaffected by payment
 
-The initial amount is saved as a Vendor Payment record with no bank account yet.
+The amount paid now is saved as a Bank Payment linked to the vehicle, and to the AP Bill when one is created. The payment posts its Transaction and statement line through Stories 8 and 9.
 
 ```text
 Vehicle cost:      $40,000
@@ -403,50 +561,71 @@ Immediate payment: $15,000
 AP Bill: amount $40,000, paid $15,000, balance $25,000, status Partial
 ```
 
-**Not yet:** bank account, bank payment, transaction, and statement line (Stories 19, 20, 23).
+**Not yet:** later vendor payments (Story 20).
 
 **Acceptance criteria**
 
-- Paid in full creates no AP Bill.
-- Partial and credit purchases create an AP Bill.
-- The AP amount equals the vehicle total cost.
-- Amount paid now cannot be negative or exceed the total cost.
-- Vehicle total cost does not change when the AP Bill is paid.
+1. Paid in full creates no AP Bill.
+2. Partial and credit purchases create an AP Bill.
+3. The AP amount equals the vehicle total cost.
+4. Amount paid now cannot be negative or exceed the total cost.
+5. Vehicle total cost does not change when the AP Bill is paid.
+6. A bank account is required whenever an amount is paid, and the payment cannot exceed its book balance.
+7. The AP Bill, Bank Payment, Transaction, statement line, and book balance save together.
 
-### Story 15: Record a later vendor payment
+### Story 20: Record a later vendor payment
 
-**Depends on:** Story 14
+**Depends on:** Story 19
 
 As an accounts payable clerk,
 
 **I want to:**
 
-- Select an open AP Bill and enter the date, amount, method, and reference
+- Select an open AP Bill and enter the date, amount, method, reference, and bank account
 - See the payment history on the bill
 
 **so that:**
 
 - AP and vendor balances stay current
 
-**Not yet:** A bank account and balance check (Story 19).
+**Acceptance criteria**
+
+1. Amount must be greater than zero.
+2. Amount cannot exceed the AP balance.
+3. Each installment creates a separate Bank Payment with its own Transaction and statement line.
+4. AP paid, balance, and status update together.
+5. Vendor outstanding balance updates.
+6. The payment cannot exceed the bank account's book balance.
+7. Previous payments are never overwritten.
+
+### Story 21: Record a payment not linked to AP
+
+**Depends on:** Story 9
+
+As an accounts payable clerk,
+
+**I want to:** record a payment to a vendor, employee, or other payee, with a payment category, that is not linked to AP
+
+**so that:**
+
+- Money paid out reduces the correct account
+- Expenses carry a category for reporting
 
 **Acceptance criteria**
 
-- Amount must be greater than zero.
-- Amount cannot exceed the AP balance.
-- Each installment creates a separate Vendor Payment record.
-- AP paid, balance, and status update together.
-- Vendor outstanding balance updates.
+1. Payee, payment category, date, amount, method, and bank account are required.
+2. Payment cannot exceed the available bank balance.
+3. The payment creates one Transaction and one statement line and decreases the book balance.
+4. Inventory purchases and AP settlements are not treated as operating expenses.
+5. Each payment is separate and previous payments are never overwritten.
 
-### Story 16: AP list and aging
+### Story 22: AP list and aging
 
-**Depends on:** Story 14
+**Depends on:** Story 19
 
 As an accountant,
 
-**I want to:**
-
-- View open AP Bills with the number of days overdue and their status
+**I want to:** view open AP Bills with days overdue and status
 
 **so that:**
 
@@ -454,125 +633,16 @@ As an accountant,
 
 **Acceptance criteria**
 
-- The list shows the vendor, bill, due date, amount, paid amount, balance, days overdue, and status.
-- Days overdue can never be less than zero.
-- An open bill with a past due date shows Overdue.
-- Vendor outstanding balance equals the sum of that vendor's open AP balances.
+1. The list shows vendor, bill, due date, amount, paid, balance, days, and status.
+2. Days overdue is never below zero.
+3. An open bill with a past due date shows Overdue.
+4. Vendor outstanding balance equals the sum of that vendor's open AP balances.
 
-## Phase 6: Banking
+## Phase 7: Corrections
 
-### Story 17: Banks and bank accounts
+### Story 23: Reverse a banking transaction
 
-**Depends on:** nothing (can be built in parallel with earlier phases)
-
-As an accountant,
-
-**I want to:**
-
-- Create and maintain banks
-- Add accounts under each bank (name, account number, routing number, type, opening balance, status)
-- See each account's current book balance
-
-**so that:**
-
-- AutoPlex can track cash held at different institutions
-
-**Not yet:** receipts, payments, transactions, and statements.
-
-**Acceptance criteria**
-
-- A Bank Account must belong to a Bank.
-- Account name and account type are required.
-- Opening balance cannot be negative.
-- Book balance starts equal to the opening balance.
-- Account numbers are masked in lists.
-- Inactive accounts are saved but cannot be used in later stories.
-
-### Story 18: Bank receipts
-
-**Depends on:** Stories 11, 17
-
-As an accounts receivable clerk,
-
-**I want to:**
-
-- Assign a bank account to a customer payment, including the initial payment in Story 10
-- Record a receipt from another payer that is not linked to AR
-
-**so that:**
-
-- Customer money is deposited into the correct account
-- The bank-account balance increases
-
-Customer Payment records become Bank Receipts. Earlier payments without a bank account stay as they are.
-
-**Not yet:** internal transaction and statement line (Stories 20, 23).
-
-**Acceptance criteria**
-
-- A bank account is required for Card, Transfer, and Check receipts.
-- Inactive accounts are rejected.
-- A posted receipt increases the selected account's book balance.
-- Receipt amount cannot exceed the selected AR balance.
-- A receipt not linked to AR does not change any customer balance.
-- Each receipt is separate and previous receipts are never overwritten.
-
-### Story 19: Bank payments
-
-**Depends on:** Stories 15, 17
-
-As an accounts payable clerk,
-
-**I want to:**
-
-- Assign a bank account to a vendor payment, including the initial payment in Story 14
-- Record a payment to a vendor, employee, or other payee, with a payment category, not linked to AP
-
-**so that:**
-
-- Money paid out reduces the correct account
-- Expenses carry a category for reporting
-
-**Not yet:** internal transaction and statement line (Stories 20, 23).
-
-**Acceptance criteria**
-
-- A bank account is required for Card, Transfer, and Check payments.
-- Payee and payment category are required for payments not linked to AP.
-- Payment cannot exceed the available bank balance.
-- Payment cannot exceed the selected AP balance.
-- A posted payment decreases the account's book balance.
-- Inventory purchases and AP settlements are not treated as operating expenses.
-
-### Story 20: Internal transaction ledger
-
-**Depends on:** Stories 18, 19
-
-As an accountant,
-
-**I want to:** have every bank receipt and payment recorded as an internal Transaction
-
-**so that:**
-
-- Every bank movement can be audited
-- Book balances can be calculated from transactions
-
-**Not yet:** statement lines and reconciliation status changes (Stories 23, 28).
-
-**Acceptance criteria**
-
-- Each posted receipt or payment creates exactly one Transaction.
-- The direction is In for receipts and Out for payments, and the amount is greater than zero.
-- Each Transaction references one bank account and its source.
-- Reconciliation status starts as Unreconciled and is kept separate from posting status.
-- Draft Transactions do not affect balances.
-- Posted Transactions cannot be deleted.
-- Existing receipts and payments are backfilled exactly once.
-- The list filters by account, direction, and date.
-
-### Story 21: Reverse a banking transaction
-
-**Depends on:** Story 20
+**Depends on:** Stories 15, 16, 20, 21
 
 As an accountant,
 
@@ -583,79 +653,31 @@ As an accountant,
 - History is preserved and balances are corrected
 - AR or AP balances are restored
 
-This enables Story 9 to cancel invoices that have been paid after their receipts are reversed.
+This also lets Story 13 cancel invoices that were paid, after their receipts are reversed.
 
 **Acceptance criteria**
 
-- A reversal requires a reason and references the original Transaction.
-- A reversed receipt creates an outgoing Transaction. A reversed payment creates an incoming Transaction.
-- The reversal amount equals the amount being reversed.
-- Bank balance, AR or AP balance, and invoice or bill status are restored.
-- Both the original transaction and its reversal remain visible.
-- The same Transaction cannot be reversed twice.
+1. A reversal requires a reason and references the original Transaction.
+2. A reversed receipt creates an outgoing Transaction. A reversed payment creates an incoming Transaction.
+3. The reversal amount equals the amount being reversed.
+4. Bank balance, AR or AP balance, and invoice or bill status are restored.
+5. The original and the reversal both stay visible.
+6. The same Transaction cannot be reversed twice.
+7. The reversal Transaction gets its own statement line.
 
-### Story 22: Transfer between bank accounts
-
-**Depends on:** Story 20
-
-As an accountant,
-
-**I want to:** move money between two AutoPlex bank accounts
-
-**so that:**
-
-- Cash can move between operating, payroll, and savings accounts
-- Total cash does not change
-
-**Not yet:** statement lines for each side (Story 23).
-
-**Acceptance criteria**
-
-- Source and destination must be different, active accounts.
-- Amount must be greater than zero and not exceed the source balance.
-- One outgoing and one incoming Transaction share a transfer reference.
-- Both balances update together.
-- A transfer does not affect revenue or operating expenses.
-
-## Phase 7: Simulated bank statement
-
-### Story 23: Generate statement lines
-
-**Depends on:** Stories 20, 22
-
-As an accountant,
-
-**I want to:** have a simulated bank statement line generated for each posted Transaction
-
-**so that:**
-
-- The statement can later be compared with the internal ledger
-
-```text
-New Running Balance =
-Previous Running Balance + Deposit − Withdrawal
-```
-
-**Acceptance criteria**
-
-- Each Transaction creates exactly one line with source Simulated and status Cleared.
-- Incoming Transactions create deposits, and outgoing Transactions create withdrawals; a line never contains both.
-- Lines created from Transactions start as Matched and store the Transaction ID.
-- Running balance is calculated in statement-date order.
-- Existing Transactions are backfilled exactly once.
-- The list filters by account, month, and type.
+## Phase 8: Statement adjustments
 
 ### Story 24: Statement-only adjustment
 
-**Depends on:** Story 23
+**Depends on:** Story 9
 
 As an accountant,
 
-**I want to:** add bank-originated activity, such as interest, charges, and refunds, to the statement only
+**I want to:** add bank-originated activity such as interest, charges, and refunds to the statement only
 
 **so that:**
 
-- The statement can differ from the books until reconciliation
+- The statement can show bank-originated activity before it is recorded in the books
 
 Types: Interest Received, Bank Service Charge, Returned Customer Payment, Vendor Refund, Automatic Loan Payment, Card Processing Fee, Other Adjustment.
 
@@ -668,11 +690,11 @@ matchStatus = Unmatched
 
 **Acceptance criteria**
 
-- Account, date, type, direction, amount, and description are required.
-- Interest defaults to incoming and bank charges to outgoing.
-- No Transaction is created, and the book balance does not change.
-- The statement running balance updates.
-- A bank reference is unique within the account when provided.
+1. Account, date, type, direction, amount, and description are required.
+2. Interest defaults to incoming and bank charges to outgoing.
+3. No Transaction is created and the book balance does not change.
+4. The statement running balance updates.
+5. A bank reference is unique within the account when provided.
 
 ### Story 25: Add and post an adjustment to books
 
@@ -688,133 +710,17 @@ As an accountant,
 
 **Acceptance criteria**
 
-- Exactly one Transaction and one statement line are created and linked.
-- The line is marked Matched.
-- Book balance increases for incoming and decreases for outgoing adjustments.
-- No duplicate statement line is created.
-- Posting is atomic.
-
-## Phase 8: Reconciliation
-
-### Story 26: Reconciliation data and balances
-
-**Depends on:** Stories 23, 24
-
-As an accountant,
-
-**I want to:** select a bank account and statement date and view the book and statement balances
-
-**so that:**
-
-- I can see the difference between the ledger and the statement
-
-```text
-Statement Closing Balance =
-Statement Opening Balance + Cleared Deposits − Cleared Withdrawals
-
-Book Closing Balance =
-Book Opening Balance + Posted Incoming − Posted Outgoing
-
-Difference =
-Statement Closing Balance − Book Closing Balance
-```
-
-**Acceptance criteria**
-
-- Only posted Transactions and cleared lines through the selected date are included.
-- Transactions and lines from other accounts are excluded.
-- Both balances use the same cutoff date.
-- Unmatched statement lines change only the statement balance.
-- Data is ordered by date and reference.
-- Switching accounts clears unrelated selections.
-
-### Story 27: Suggest matches
-
-**Depends on:** Story 26
-
-As an accountant,
-
-**I want to:** receive suggested matches between Transactions and statement lines
-
-**so that:**
-
-- I do not compare every record by hand
-
-**Acceptance criteria**
-
-- A match requires the same account, amount, and direction, a compatible date, and a compatible reference or description.
-- Incoming Transactions match only deposits. Outgoing match only withdrawals.
-- Results are Exact, Suggested, Missing internal Transaction, or Ambiguous.
-- One Transaction matches at most one line, and one line at most one Transaction.
-- Reconciled Transactions are not suggested again.
-- Ambiguous matches need manual confirmation.
-
-### Story 28: Confirm a match
-
-**Depends on:** Story 27
-
-As an accountant,
-
-**I want to:** confirm a suggested match
-
-**so that:**
-
-- Both records are marked reconciled and cannot be reconciled twice
-
-**Acceptance criteria**
-
-- The Transaction becomes Reconciled and the line is linked and Matched.
-- Amounts are never changed by matching.
-- User and reconciliation date are kept.
-- Reconciled records are locked.
-- The same match cannot be confirmed twice.
-- The difference recalculates immediately.
-
-### Story 29: Post an unmatched adjustment
-
-**Depends on:** Stories 25, 28
-
-As an accountant,
-
-**I want to:** create the missing Transaction for an unmatched statement line
-
-**so that:**
-
-- The book balance is corrected and the difference is resolved
-
-**Acceptance criteria**
-
-- Post Adjustment appears only on unmatched manual statement lines.
-- The new Transaction uses the line's account, date, amount, and direction.
-- No second statement line is created.
-- Book balance updates once and the line becomes Matched.
-- The same line cannot be posted twice.
-
-### Story 30: Reset or reopen reconciliation
-
-**Depends on:** Story 28
-
-As an authorized accountant,
-
-**I want to:** reset or reopen a reconciliation
-
-**so that:**
-
-- Wrong matches can be fixed with an audit trail
-
-**Acceptance criteria**
-
-- Only authorized users can reset, and a reason is required.
-- Eligible matches unlock and statuses return to their previous state.
-- No Transactions or statement lines are deleted.
-- User and date are recorded.
-- Finalized periods need elevated permission to reopen.
+1. Exactly one Transaction and one statement line are created and linked.
+2. The line is marked Matched.
+3. Book balance increases for incoming and decreases for outgoing adjustments.
+4. No duplicate statement line is created.
+5. Posting is atomic.
 
 ## Phase 9: Reporting
 
-### Story 31: Revenue
+### Story 26: Revenue
 
-**Depends on:** Stories 8, 25
+**Depends on:** Stories 12, 25
 
 As a financial controller,
 
@@ -832,14 +738,14 @@ Vehicle Revenue + Service Revenue + Fee Income
 
 **Acceptance criteria**
 
-- Revenue comes from posted, non-cancelled Sales Invoices, regardless of payment status.
-- Sales tax, AR receipts, and bank transfers are excluded.
-- Interest and other income come from posted incoming adjustments only.
-- Statement-only unmatched adjustments are excluded.
+1. Revenue comes from posted, non-cancelled Sales Invoices, regardless of payment status.
+2. Sales tax, AR receipts, and bank transfers are excluded.
+3. Interest and other income come from posted incoming adjustments only.
+4. Statement-only unmatched adjustments are excluded.
 
-### Story 32: Cost of goods sold
+### Story 27: Cost of goods sold
 
-**Depends on:** Stories 6, 8
+**Depends on:** Stories 6, 12
 
 As a financial controller,
 
@@ -856,18 +762,18 @@ Parts COGS = Actual quantity sold × Cost Price
 
 **Acceptance criteria**
 
-- Each vehicle on a posted invoice is included exactly once.
-- Unsold inventory and AP payments create no COGS.
-- Cancelled sales reverse their COGS.
-- Parts COGS stays zero until part sale or usage records exist.
+1. Only vehicles on posted invoices are included, once each.
+2. Unsold inventory and AP payments create no COGS.
+3. Cancelled sales reverse their COGS.
+4. Parts COGS stays zero until part sale or usage records exist.
 
-### Story 33: Operating expenses
+### Story 28: Operating expenses
 
-**Depends on:** Stories 2, 19, 25
+**Depends on:** Stories 2, 21, 25
 
 As a financial controller,
 
-**I want to:** calculate operating expenses from payroll and categorized payments
+**I want to:** see operating expenses from payroll and categorized payments
 
 **so that:**
 
@@ -875,19 +781,19 @@ As a financial controller,
 
 **Acceptance criteria**
 
-- Salary, bonus, and commission come from employee and invoice records.
-- Categorized bank payments and posted bank charges are included.
-- Vehicle and parts purchases, AP settlements for inventory, loan principal, tax, transfers, and revenue-reversing refunds are excluded.
-- The same expense is never counted from both an accrual and a cash payment.
-- Interest received is income, not a negative expense.
+1. Salary, bonus, and commission come from employee and invoice records.
+2. Categorized bank payments and posted bank charges are included.
+3. Vehicle and parts purchases, AP settlements for inventory, loan principal, tax, transfers, and revenue-reversing refunds are excluded.
+4. The same expense is never counted from both an accrual and a cash payment.
+5. Interest received is income, not a negative expense.
 
-### Story 34: Profit and Loss report
+### Story 29: Profit & Loss report
 
-**Depends on:** Stories 31, 32, 33
+**Depends on:** Stories 26, 27, 28
 
 As a financial controller,
 
-**I want to:** generate a profit and loss report for a selected month, quarter, or year-to-date period
+**I want to:** see a Profit & Loss report for a selected month, quarter, or year to date
 
 **so that:**
 
@@ -895,17 +801,17 @@ As a financial controller,
 
 **Acceptance criteria**
 
-- Shows total revenue, COGS, gross profit, operating expenses, net profit, gross margin, and net margin.
-- Draft and cancelled invoices are excluded.
-- The report produces the same results whenever the period and data are unchanged.
+1. Shows total revenue, COGS, gross profit, operating expenses, net profit, gross margin, and net margin.
+2. Draft and cancelled invoices are excluded.
+3. Results are the same for the same period and data.
 
-### Story 35: Compare periods
+### Story 30: Compare periods
 
-**Depends on:** Story 34
+**Depends on:** Story 29
 
 As a financial controller,
 
-**I want to:** compare the current period with a previous period
+**I want to:** compare the current period with a previous one
 
 **so that:**
 
@@ -918,13 +824,13 @@ Percentage Change =
 
 **Acceptance criteria**
 
-- Periods do not overlap and use the same rules.
-- Change shows as unavailable when the previous amount is zero.
-- Negative profit displays clearly.
+1. Periods do not overlap and use the same rules.
+2. Change shows as unavailable when the previous amount is zero.
+3. Negative profit displays clearly.
 
-### Story 36: Drill-down and export
+### Story 31: Drill-down and export
 
-**Depends on:** Story 34
+**Depends on:** Story 29
 
 As an accountant,
 
@@ -936,8 +842,8 @@ As an accountant,
 
 **Acceptance criteria**
 
-- Drill-down totals equal the report amount, and records keep their references.
-- Posted records cannot be edited from the report without permission.
-- Exports show the period, current and previous values, company name, and generation date.
-- Exported totals match the screen, and exporting changes no data.
-- Only authorized users can drill down into or export sensitive reports.
+1. Drill-down totals equal the report amount, and records keep their references.
+2. Posted records cannot be edited from the report without permission.
+3. Exports show the period, current and previous values, company name, and generation date.
+4. Exported totals match the screen, and exporting changes no data.
+5. Only authorized users can drill down into or export sensitive reports.
